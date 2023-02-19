@@ -35,6 +35,6 @@ def combine_mp3_files(file1: str, file2: str) -> str:
     sound1 = AudioSegment.from_mp3(file1)
     sound2 = AudioSegment.from_mp3(file2)
     combined = sound1 + sound2
-    new = file1.rsplit(".", 1)[0] + "(combined) .mp3"
+    new = file1.rsplit(".", 1)[0] + " (combined).mp3"
     combined.export(new, format="mp3")
     return new
