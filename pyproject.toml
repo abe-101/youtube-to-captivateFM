@@ -3,11 +3,11 @@ requires = ["flit"]
 build-backend = "flit.buildapi"
 
 [project]
-name =  "py-project-toml"
+name =  "youtube-to-captivateFM"
 authors = [
-    {name = "Daniel Ciborowski", email = "dciborow@microsoft.com"},
+    {name = "Abe Habet", email = "abe@habet.dev"},
 ]
-description = "Sample Python Project for creating a new Python Module"
+description = "Convert YouTube videos into podcasts using Captivate.fm"
 readme = "README.md"
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -22,6 +22,13 @@ classifiers = [
 requires-python = ">=3.7"
 dynamic = ["version"]
 
+dependencies = [
+		"playwright",
+		"pydub",
+		"python-dotenv",
+		"requests",
+		"yt_dlp",
+]
 [project.optional-dependencies]
 spark = [
     "pyspark>=3.0.0"
@@ -46,9 +53,9 @@ test = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/microsoft/python-package-template/tree/main#readme"
-Source = "https://github.com/microsoft/python-package-template"
-Tracker = "https://github.com/microsoft/python-package-template/issues"
+Documentation = "https://github.com/abe-101/youtube-to-captivateFM/tree/main#readme"
+Source = "https://github.com/abe-101/youtube-to-captivateFM"
+Tracker = "https://github.com/abe-101/youtube-to-captivateFM/issues"
 
 [tool.flit.module]
 name = "python_package"
