@@ -1,6 +1,50 @@
+import subprocess
 from typing import Optional
 
 from pydub import AudioSegment
+
+
+def create_video_from_audio_and_picture(audio_file: str, image_file: str, video_file: str) -> str:
+    """
+    Creates a video from an audio file and an image file, and saves the video as a new file.
+
+    Args:
+        audio_file (str): The path to the audio file.
+        image_file (str): The path to the image file.
+        video_file (str): The path to save the video file.
+
+    Returns:
+        str: The name of the created video file.
+
+    Raises:
+        ValueError: If either the audio or image file does not exist.
+
+    """
+
+    ffmpeg_command = [
+        "ffmpeg",
+        "-loop",
+        "1",
+        "-i",
+        image_file,
+        "-i",
+        audio_file,
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-tune",
+        "stillimage",
+        "-crf",
+        "18",
+        "-c:a",
+        "copy",
+        "-shortest",
+        video_file,
+    ]
+    subprocess.run(ffmpeg_command)
+
+    return video_file
 
 
 def convert_wav_to_mp3(input_file: str, output_file: Optional[str] = None) -> str:
