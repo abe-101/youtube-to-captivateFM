@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 from adobe_podcast import enhance_podcast
-from audio_conversion import combine_mp3_files
+from audio_conversion import combine_mp3_files, create_video_from_audio_and_picture
 from captivate_api import (
     create_podcast,
     format_date,
@@ -15,6 +15,7 @@ from captivate_api import (
     upload_media,
 )
 from downlaod_yt import download_youtube_video
+from upload_video import upload_video_with_options
 
 load_dotenv()
 
@@ -22,6 +23,15 @@ USER_ID = os.getenv("USER_ID")
 API_KEY = os.getenv("CAPTIVATE_API_KEY")
 SHOW_ID = os.getenv("SHOWS_ID")
 DATA_DIR = os.getenv("DATA_DIR")
+
+
+def the_daily_halacha_shiur(file: str, picture: str, title: str, description):
+    print("Enhancing audio quality")
+    file = enhance_podcast(file)
+    print("Creating Video")
+    file = create_video_from_audio_and_picture(file, picture, DATA_DIR + title + ".mp4")
+    print("Uploading to YouTube")
+    upload_video_with_options(file, title, description, privacyStatus="public")
 
 
 def download2_and_enhance(url1: str, url2: str) -> str:
