@@ -14,7 +14,7 @@ from captivate_api import (
     update_podcast,
     upload_media,
 )
-from downlaod_yt import download_youtube_video
+from download_yt import download_youtube_video
 from upload_video import upload_video_with_options
 
 load_dotenv()
@@ -24,12 +24,15 @@ API_KEY = os.getenv("CAPTIVATE_API_KEY")
 SHOW_ID = os.getenv("SHOWS_ID")
 DATA_DIR = os.getenv("DATA_DIR")
 
+daily_halacha = """Get your daily does of practical Halacha, in just 2 minutes.
+The perfect and convenient way to start your day!
+Shiur by Rabbi Shloimy Greenwald"""
 
-def the_daily_halacha_shiur(file: str, picture: str, title: str, description):
+def the_daily_halacha_shiur(file: str, picture: str, title: str, description=daily_halacha):
     print("Enhancing audio quality")
     file = enhance_podcast(file)
     print("Creating Video")
-    file = create_video_from_audio_and_picture(file, picture, DATA_DIR + title + ".mp4")
+    file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
     upload_video_with_options(file, title, description, privacyStatus="public")
 
@@ -79,9 +82,9 @@ def temp_update(media_id, episode_id):
     print(episode_url)
 
 
-def youtube_to_captivatefm(url: str):
+def youtube_to_captivateFM(url: str):
     info = download_youtube_video(url, DATA_DIR)
-    formated_upload_date = format_date(info["upload_date"])
+    formatted_upload_date = format_date(info["upload_date"])
     print(info["file_name"])
     print("Enhancing audio quality")
     enhanced_file = enhance_podcast(info["file_name"])
@@ -94,7 +97,7 @@ def youtube_to_captivatefm(url: str):
     episode_url = create_podcast(
         token=token,
         media_id=media_id,
-        date=formated_upload_date,
+        date=formatted_upload_date,
         title=info["title"],
         shownotes=info["description"] + "\n" + url,
         shows_id=SHOW_ID,
@@ -103,4 +106,4 @@ def youtube_to_captivatefm(url: str):
 
 
 if __name__ == "__main__":
-    youtube_to_captivatefm(input("Enter url of youtube video: "))
+    youtube_to_captivateFM(input("Enter url of youtube video: "))
