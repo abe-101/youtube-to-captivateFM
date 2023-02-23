@@ -98,7 +98,8 @@ def resumable_upload(request):
 
 
 # this function creates the request and initializes the upload
-def intialize_upload(youtube, options):
+def initialize_upload(youtube, options):
+    print(options)
     tags = None
     if options.keywords:
         tags = options.keywords.split(",")
@@ -118,14 +119,21 @@ def intialize_upload(youtube, options):
 
 
 def upload_video_with_options(
-    file: str, title: str, description: str, category: str = "13", keywords: str = "", privacyStatus: str = "private"
+    file: str, title: str, description: str, category: str = "22", keywords: str = "", privacyStatus: str = "private"
 ):
-    options = Options(file, title, description, category, keywords, privacyStatus)
+    options = Options(
+        file=file,
+        title=title,
+        description=description,
+        category=category,
+        keywords=keywords,
+        privacyStatus=privacyStatus,
+    )
     # Disable OAUTHlib's https verification locally. DO NOT USE in production.
     os.environ["OUATHLIB_INSECURE_TRANSPORT"] = "1"
     # Call the upload_video method with the options
     youtubedata = get_service()
-    intialize_upload(youtubedata, options)
+    initialize_upload(youtubedata, options)
 
 
 # function when run directly
@@ -138,7 +146,7 @@ def main():
     parser.add_argument("--description", help="Video description", default="Test Description")
     parser.add_argument(
         "--category",
-        default="13",
+        default="22",
         help="Numeric video category. " + "See https://developers.google.com/youtube/v3/docs/videoCategories/list",
     )
     parser.add_argument("--keywords", help="Video keywords, comma separated", default="")
@@ -147,7 +155,7 @@ def main():
     )
     args = parser.parse_args()
     youtubedata = get_service()
-    intialize_upload(youtubedata, args)
+    initialize_upload(youtubedata, args)
 
 
 if __name__ == "__main__":
