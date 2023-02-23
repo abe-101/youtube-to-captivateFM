@@ -46,8 +46,11 @@ def get_token(user_id: str, api_key: str) -> Union[str, None]:
 
     try:
         response = requests.request(
-            "POST", url, headers=headers, data=payload, files=files
-        )
+            "POST",
+            url,
+            headers=headers,
+            data=payload,
+            files=files)
         response.raise_for_status()
         r = response.json()
         return r["user"]["token"]
@@ -147,8 +150,11 @@ def create_podcast(
 
     try:
         response = requests.request(
-            "POST", url, headers=headers, data=payload, files=files
-        )
+            "POST",
+            url,
+            headers=headers,
+            data=payload,
+            files=files)
         response.raise_for_status()
         r = response.json()
         episode_id = r["record"]["id"]
@@ -189,13 +195,28 @@ def get_episode(token: str, episode_id: str) -> Union[dict, None]:
 
 
 def update_podcast(
-    token: str, media_id: str, shows_id: str, episode_id: str
+    token: str,
+    media_id: str,
+    shows_id: str,
+    episode_id: str,
+    shownotes: str,
+    title: str,
+    date: str,
+    status: str = "draft",
+    episode_season: str = "1",
+    episode_number: str = "1",
 ) -> Union[str, None]:
     url = f"https://api.captivate.fm/episodes/{episode_id}"
 
     payload = {
         "shows_id": shows_id,
         "media_id": media_id,
+        "title": title,
+        "date": date,
+        "status": status,
+        "shownotes": shownotes,
+        "episode_season": episode_season,
+        "episode_number": episode_number,
     }
 
     files = []
@@ -203,14 +224,16 @@ def update_podcast(
 
     try:
         response = requests.request(
-            "PUT", url, headers=headers, data=payload, files=files
-        )
+            "PUT",
+            url,
+            headers=headers,
+            data=payload,
+            files=files)
         response.raise_for_status()
         r = response.json()
-        # episode_id = r["episode"]["id"]
+        episode_id = r["episode"]["id"]
 
-        # return f"https://player.captivate.fm/episode/{episode_id}"
-        return r
+        return f"https://player.captivate.fm/episode/{episode_id}"
     except requests.exceptions.HTTPError as error:
         print(f"An HTTP error occurred: {error}")
         return None

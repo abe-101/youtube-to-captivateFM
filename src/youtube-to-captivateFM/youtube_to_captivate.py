@@ -28,6 +28,7 @@ daily_halacha = """Get your daily does of practical Halacha, in just 2 minutes.
 The perfect and convenient way to start your day!
 Shiur by Rabbi Shloimy Greenwald"""
 
+
 def the_daily_halacha_shiur(file: str, picture: str, title: str, description=daily_halacha):
     print("Enhancing audio quality")
     file = enhance_podcast(file)
@@ -58,7 +59,7 @@ def download_and_enhance(url: str) -> str:
     return enhanced_file
 
 
-def add_audio_to_podcast(file_path_1, url):
+def add_audio_to_podcast(file_path_1, url, episode_id):
     info = download_youtube_video(url, DATA_DIR)
     print("Enhancing audio quality")
     file_path_2 = enhance_podcast(info["file_name"])
@@ -69,15 +70,19 @@ def add_audio_to_podcast(file_path_1, url):
     print("uploading media: " + combined)
     media_id = upload_media(token=token, show_id=SHOW_ID, file_name=combined)
     print(media_id)
-
-
-def temp_update(media_id, episode_id):
     token = get_token(user_id=USER_ID, api_key=API_KEY)
+    episode = get_episode(token, episode_id)
     episode_url = update_podcast(
         token=token,
         media_id=media_id,
         shows_id=SHOW_ID,
         episode_id=episode_id,
+        shownotes=episode["shownotes"],
+        title=episode["title"],
+        date=episode["published_date"],
+        status=episode["status"],
+        episode_season=episode["episode_season"],
+        episode_number=episode["episode_number"],
     )
     print(episode_url)
 
