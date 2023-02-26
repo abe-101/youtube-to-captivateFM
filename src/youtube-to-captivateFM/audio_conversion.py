@@ -4,7 +4,8 @@ from typing import Optional
 from pydub import AudioSegment
 
 
-def create_video_from_audio_and_picture(audio_file: str, image_file: str, video_file: str) -> str:
+def create_video_from_audio_and_picture(
+        audio_file: str, image_file: str, video_file: str) -> str:
     """
     Creates a video from an audio file and an image file, and saves the video as a new file.
 
@@ -47,7 +48,8 @@ def create_video_from_audio_and_picture(audio_file: str, image_file: str, video_
     return video_file
 
 
-def convert_wav_to_mp3(input_file: str, output_file: Optional[str] = None) -> str:
+def convert_wav_to_mp3(input_file: str,
+                       output_file: Optional[str] = None) -> str:
     """Convert WAV audio file to MP3.
 
     :param input_file: The file path of the WAV audio file to be converted.
@@ -82,3 +84,30 @@ def combine_mp3_files(file1: str, file2: str) -> str:
     new = file1.rsplit(".", 1)[0] + " (combined).mp3"
     combined.export(new, format="mp3")
     return new
+
+
+def combine_webm_files(input_file1: str, input_file2: str,
+                       output_file: str = None) -> None:
+    """
+    Combine two WebM audio files into a single file.
+
+    :param input_file1: Path to the first WebM audio file to combine.
+    :type input_file1: str
+    :param input_file2: Path to the second WebM audio file to combine.
+    :type input_file2: str
+    :param output_file: Path to the output audio file.
+    :type output_file: str
+    """
+    # Load the input files using Pydub.
+    sound1 = AudioSegment.from_file(input_file1, format="webm")
+    sound2 = AudioSegment.from_file(input_file2, format="webm")
+
+    # Combine the two audio segments using Pydub.
+    combined_sound = sound1 + sound2
+
+    if output_file is None:
+        output_file = input_file1.rsplit(".", 1)[0] + " (combined).webm"
+
+    # Export the combined audio as a WebM file using Pydub.
+    combined_sound.export(output_file, format="webm")
+    return output_file
