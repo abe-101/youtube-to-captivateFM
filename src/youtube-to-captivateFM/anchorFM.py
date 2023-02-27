@@ -137,9 +137,9 @@ async def post_episode_anchorfm(
     browser = await launch(args=["--no-sandbox"], headless=PUPETEER_HEADLESS)
     page = await browser.newPage()
 
-    navigationPromise = await page.waitForNavigation()
     await page.goto("https://anchor.fm/dashboard/episode/new")
     await page.setViewport({"width": 1600, "height": 789})
+    navigationPromise = await page.waitForNavigation()
 
     print("Trying to log in")
     await page.type("#email", ANCHOR_EMAIL)
@@ -207,6 +207,7 @@ async def post_episode_anchorfm(
     await page.waitForNavigation()
 
     print("Yay")
+    await browser.close()
 
 
 def getSaveDraftOrPublishOrScheduleButtonDescription(SAVE_AS_DRAFT, SET_PUBLISH_DATE):
