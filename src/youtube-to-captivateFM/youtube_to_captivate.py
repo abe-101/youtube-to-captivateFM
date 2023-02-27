@@ -69,7 +69,7 @@ spotify - {spotify}
     print(post_message)
 
 
-def the_daily_halacha_shiur(file: str, title: str, picture: str = "data/halacha/halacha.jpg"):
+def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg"):
     daily_halacha = """Get your daily dose of practical Halacha, in just 2 minutes.
     The perfect and convenient way to start your day!
     Shiur by Rabbi Shloimy Greenwald"""
