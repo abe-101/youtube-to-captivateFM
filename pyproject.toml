@@ -28,6 +28,7 @@ dependencies = [
 		"python-dotenv",
 		"requests",
 		"yt_dlp",
+		"pyppeteer",
 ]
 [project.optional-dependencies]
 spark = [
