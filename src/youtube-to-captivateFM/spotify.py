@@ -1,57 +1,73 @@
 import base64
+import time
 import requests
-from typing import Dict, Any
+
 
 def get_spotify_access_token(client_id: str, client_secret: str) -> str:
     """
-    Fetches an access token from the Spotify API using a client ID and client secret.
+    Retrieve an access token from the Spotify API using the provided client ID and client secret.
 
-    Parameters:
-    client_id (str): The client ID for the Spotify API.
-    client_secret (str): The client secret for the Spotify API.
+    :param client_id: The client ID for the Spotify API.
+    :type client_id: str
 
-    Returns:
-    str: The access token for the Spotify API.
+    :param client_secret: The client secret for the Spotify API.
+    :type client_secret: str
+
+    :return: The access token for the Spotify API.
+    :rtype: str
     """
+
     # Encode the client ID and client secret
-    client_credentials = f'{client_id}:{client_secret}'
-    encoded_credentials = base64.b64encode(client_credentials.encode('ascii')).decode('ascii')
+    client_credentials = f"{client_id}:{client_secret}"
+    encoded_credentials = base64.b64encode(client_credentials.encode("ascii")).decode("ascii")
 
     # Send a request to the Spotify API to fetch an access token
-    url = 'https://accounts.spotify.com/api/token'
-    headers = {'Authorization': f'Basic {encoded_credentials}'}
-    data = {'grant_type': 'client_credentials'}
+    url = "https://accounts.spotify.com/api/token"
+    headers = {"Authorization": f"Basic {encoded_credentials}"}
+    data = {"grant_type": "client_credentials"}
     response = requests.post(url, headers=headers, data=data)
 
     # Check if the request was successful
     if response.status_code != 200:
-        raise ValueError('Failed to obtain Spotify access token')
+        raise ValueError("Failed to obtain Spotify access token")
 
     # Return the access token
-    access_token = response.json()['access_token']
+    access_token = response.json()["access_token"]
     return access_token
 
 
-def get_latest_spotify_episode_link(podcast_channel: str, access_token: str) -> str:
+def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, access_token: str) -> str:
     """
-    Fetches the link of the latest episode of a podcast channel on Spotify.
+    Retrieve the latest Spotify episode link for a given podcast channel and episode name using the provided access token.
 
-    Parameters:
-    podcast_channel (str): The name of the podcast channel.
-    access_token (str): The access token for the Spotify API.
+    :param episode_name: The name of the episode to retrieve the link for.
+    :type episode_name: str
 
-    Returns:
-    str: The link of the latest episode of the podcast channel on Spotify.
+    :param podcast_channel_id: The ID of the podcast channel to retrieve the link from.
+    :type podcast_channel_id: str
+
+    :param access_token: The access token for the Spotify API.
+    :type access_token: str
+
+    :return: The latest Spotify episode link for the given podcast channel and episode name.
+    :rtype: str
     """
-    url = f'https://api.spotify.com/v1/search?q={podcast_channel}&type=episode&limit=1'
-    headers = {'Authorization': f'Bearer {access_token}'}
-    response = requests.get(url, headers=headers).json()
 
-    # Check if any episodes were found
-    if not response['episodes']['items']:
-        raise ValueError(f'No episodes found for podcast channel: {podcast_channel}')
+    count = 5
+    while count > 0:
+        url = f"https://api.spotify.com/v1/shows/{podcast_channel_id}/episodes?market=us"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        response = requests.get(url, headers=headers).json()
+
+        for i in range(5):
+            episode = response["items"][i]
+            if episode["name"] == episode_name:
+                return episode["external_urls"]["spotify"]
+        print(f"episode: {episode_name} not yet found on {podcast_channel_id}")
+        count -= 1
+        print("waiting 2 minutes to try again")
+        time.sleep(120)
 
     # Return the link of the latest episode
-    latest_episode = response['episodes']['items'][0]
-    return latest_episode['external_urls']['spotify']
-
+    # latest_episode = response['episodes']['items'][0]
+    # return latest_episode['external_urls']['spotify']
