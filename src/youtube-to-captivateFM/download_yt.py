@@ -26,4 +26,5 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
         "description": video_info.get("description"),
         "file_name": video_info["requested_downloads"][0]["filepath"],
         "upload_date": video_info.get("upload_date"),
+        "url": url,
     }
