@@ -56,7 +56,7 @@ def likutei_torah_shiur(url: str):
             SAVE_AS_DRAFT=False,
         )
     )
-    spotify_link = get_spotify_link_for_podcast(title)
+    spotify_link = get_spotify_link_for_podcast(info["title"])
 
     post_message = """
 {title}
@@ -102,11 +102,17 @@ def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg")
     youtube_link = input("What is the youtube link? ")
     print("======\n\n")
     spotify_link = get_spotify_link_for_podcast(title)
+
     post_message = """
 Carpool Halacha
 
-The Laws of reading the Megillah
+*The Laws of reading the Megillah*
 ({title})
+Topics include:
+
+- Carrying a Megillah on Shabbos even with an Eriv
+- If theirs no Kosher Megillah in the Shul, or no one knows how to sing the trop properly,what should be done.
+- If a Megillah is missing words or sections what’s the proper conduct.
 
 youtube - {youtube}
 spotify - {spotify}
