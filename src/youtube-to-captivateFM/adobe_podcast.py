@@ -1,3 +1,4 @@
+import os
 from playwright.sync_api import Playwright, sync_playwright
 
 from audio_conversion import convert_wav_to_mp3
@@ -5,8 +6,13 @@ from audio_conversion import convert_wav_to_mp3
 
 # Function to run the audio enhancement process using Adobe Podcast
 def run(playwright: Playwright, file_name: str) -> None:
+    new_file = file_name.rsplit(".", 1)[0] + " (enhanced).mp3"
+    # check if file was already enhanced
+    if os.path.exists(new_file):
+        print(f"file: {file_name} was already enhanced, skipping")
+        return new_file
     # Launch the chromium browser
-    browser = playwright.chromium.launch()
+    browser = playwright.chromium.launch(headless=False)
 
     # Create a new context with saved authentication information
     # For first-time users, sign in manually and save the session and cookies using the command:
@@ -20,7 +26,7 @@ def run(playwright: Playwright, file_name: str) -> None:
     # Upload the audio file
     page.get_by_label("Upload").set_input_files(file_name)
     # Wait for the "Download" button to become available
-    page.get_by_role("button", name="Download").wait_for(timeout=600000)
+    page.get_by_role("button", name="Download").wait_for(timeout=800000)
 
     print("Downloading the enhanced file")
     # Triggers the download of the enhanced file and gets its info
@@ -32,15 +38,13 @@ def run(playwright: Playwright, file_name: str) -> None:
     print(download.path())
     # Converts the enhanced audio from WAV to MP3 using FFmpeg
     print("doint the ffmpeg thing")
-    new_name = convert_wav_to_mp3(
-        download.path(), file_name.rsplit(".", 1)[0] + " (enhanced).mp3"
-    )
+    new_name = convert_wav_to_mp3(download.path(), new_file)
 
     # ---------------------
     # Closes the context and browser instance
     context.close()
     browser.close()
-    # return file_name[:-4] + " (enhanced).mp3"
+
     return new_name
 
 

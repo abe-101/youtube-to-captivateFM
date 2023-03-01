@@ -2,6 +2,7 @@
 
 import os
 import asyncio
+from datetime import datetime
 
 from dotenv import load_dotenv
 
@@ -28,14 +29,15 @@ SHOW_ID = os.getenv("SHOWS_ID")
 DATA_DIR = os.getenv("DATA_DIR")
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-SPOTIFY_CHANNEL_ID = os.getenv("SPOTIFY_CHANNEL_ID")
+KOLEL_SPOTIFY_ID = os.getenv("KOLEL_SPOTIFY_ID")
+PLS_SPOTIFY_ID = os.getenv("PLS_SPOTIFY_ID")
 ANCHOR_EMAIL = os.getenv("ANCHOR_EMAIL")
 ANCHOR_PASSWORD = os.getenv("ANCHOR_PASSWORD")
 
 
-def get_spotify_link_for_podcast(podcast_name: str):
+def get_spotify_link_for_podcast(podcast_name: str, channel_id):
     access_token = get_spotify_access_token(CLIENT_ID, CLIENT_SECRET)
-    link = get_latest_spotify_episode_link(podcast_name, SPOTIFY_CHANNEL_ID, access_token)
+    link = get_latest_spotify_episode_link(podcast_name, channel_id, access_token)
     return link
 
 
@@ -56,7 +58,7 @@ def likutei_torah_shiur(url: str):
             SAVE_AS_DRAFT=False,
         )
     )
-    spotify_link = get_spotify_link_for_podcast(info["title"])
+    spotify_link = get_spotify_link_for_podcast(info["title"], KOLEL_SPOTIFY_ID)
 
     post_message = """
 {title}
@@ -64,20 +66,30 @@ def likutei_torah_shiur(url: str):
 youtube - {youtube}
 spotify - {spotify}
 """.format(
-        title=info["title"], youtube=youtube_link, spotify=spotify_link
+        title=info["title"], youtube=info["url"], spotify=spotify_link
     )
     print(post_message)
 
 
 def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg"):
-    daily_halacha = """Get your daily dose of practical Halacha, in just 2 minutes.
-    The perfect and convenient way to start your day!
-    Shiur by Rabbi Shloimy Greenwald"""
+    description = """Carpool Halacha
+
+*The Laws of Mishaloach Manos, Matanos La’evyonim, and the Purim meal*
+({title})
+Topics include:
+
+- What is my exact obligation in Shalach Manos
+- Someone who lives off Tzdukah, does he still need to give Matanus Lievyonim
+- Should I investigate where my monies go to on Purim
+""".format(
+        title=title
+    )
+
     print("Enhancing audio quality")
     file = enhance_podcast(file)
     podcast_info = {
         "title": title,
-        "description": daily_halacha,
+        "description": description,
         "file_name": file,
         "upload_date": None,
         "url": None,
@@ -101,23 +113,10 @@ def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg")
 
     youtube_link = input("What is the youtube link? ")
     print("======\n\n")
-    spotify_link = get_spotify_link_for_podcast(title)
+    spotify_link = get_spotify_link_for_podcast(title, KOLEL_SPOTIFY_ID)
 
-    post_message = """
-Carpool Halacha
-
-*The Laws of reading the Megillah*
-({title})
-Topics include:
-
-- Carrying a Megillah on Shabbos even with an Eriv
-- If theirs no Kosher Megillah in the Shul, or no one knows how to sing the trop properly,what should be done.
-- If a Megillah is missing words or sections what’s the proper conduct.
-
-youtube - {youtube}
-spotify - {spotify}
-""".format(
-        title=title, youtube=youtube_link, spotify=spotify_link
+    post_message = description + f"\nyoutube - {youtube}\nspotify - {spotify}".format(
+        youtube=youtube_link, spotify=spotify_link
     )
     print(post_message)
 
@@ -167,16 +166,40 @@ def add_audio_to_podcast(file_path_1, url, episode_id):
         episode_season=episode["episode_season"],
         episode_number=episode["episode_number"],
     )
+
     print(episode_url)
+
+
+def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.jpg"):
+    print("Enhancing audio quality")
+    enhanced_file = enhance_podcast(info["file_name"])
+    print(enhanced_file)
+    today = datetime.today()
+    date_str = today.strftime("%Y%m%d")
+    info = {
+        "title": title,
+        "description": title,
+        "file_name": enhanced_file,
+        "upload_date": date_str,
+        "url": None,
+    }
+    audio_to_captivateFM(info)
+    file = create_video_from_audio_and_picture(file, picture, "data/" + title + ".mp4")
+    print("Uploading to YouTube")
+    upload_video_with_options(file, title, description=daily_halacha, privacyStatus="public")
 
 
 def youtube_to_captivateFM(url: str):
     info = download_youtube_video(url, DATA_DIR)
-    formatted_upload_date = format_date(info["upload_date"])
     print(info["file_name"])
     print("Enhancing audio quality")
     enhanced_file = enhance_podcast(info["file_name"])
     print(enhanced_file)
+    audio_to_captivateFM(info)
+
+
+def audio_to_captivateFM(info):
+    formatted_upload_date = format_date(info["upload_date"])
     print("getting user token")
     token = get_token(user_id=USER_ID, api_key=API_KEY)
     print("uploading media: " + enhanced_file)
@@ -191,6 +214,8 @@ def youtube_to_captivateFM(url: str):
         shows_id=SHOW_ID,
     )
     print(episode_url)
+    spotify_link = get_spotify_link_for_podcast(info["title"], PLS_SPOTIFY_ID)
+    print(spotify_link)
 
 
 if __name__ == "__main__":
