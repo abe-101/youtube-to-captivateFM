@@ -86,7 +86,7 @@ Topics include:
     )
 
     print("Enhancing audio quality")
-    file = enhance_podcast(file)
+    # file = enhance_podcast(file)
     podcast_info = {
         "title": title,
         "description": description,
@@ -115,9 +115,7 @@ Topics include:
     print("======\n\n")
     spotify_link = get_spotify_link_for_podcast(title, KOLEL_SPOTIFY_ID)
 
-    post_message = description + f"\nyoutube - {youtube}\nspotify - {spotify}".format(
-        youtube=youtube_link, spotify=spotify_link
-    )
+    post_message = description + f"\nyoutube - {youtube_link}\nspotify - {spotify_link}"
     print(post_message)
 
 
@@ -172,8 +170,10 @@ def add_audio_to_podcast(file_path_1, url, episode_id):
 
 def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.jpg"):
     print("Enhancing audio quality")
-    enhanced_file = enhance_podcast(info["file_name"])
+    # enhanced_file = enhance_podcast(info["file_name"])
+    enhanced_file = file
     print(enhanced_file)
+
     today = datetime.today()
     date_str = today.strftime("%Y%m%d")
     info = {
@@ -181,12 +181,14 @@ def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.
         "description": title,
         "file_name": enhanced_file,
         "upload_date": date_str,
-        "url": None,
+        "url": "",
     }
     audio_to_captivateFM(info)
     file = create_video_from_audio_and_picture(file, picture, "data/" + title + ".mp4")
+    spotify_link = get_spotify_link_for_podcast(info["title"], PLS_SPOTIFY_ID)
+    print(spotify_link)
     print("Uploading to YouTube")
-    upload_video_with_options(file, title, description=daily_halacha, privacyStatus="public")
+    upload_video_with_options(file, title, description=info["description"], privacyStatus="public")
 
 
 def youtube_to_captivateFM(url: str):
@@ -202,8 +204,8 @@ def audio_to_captivateFM(info):
     formatted_upload_date = format_date(info["upload_date"])
     print("getting user token")
     token = get_token(user_id=USER_ID, api_key=API_KEY)
-    print("uploading media: " + enhanced_file)
-    media_id = upload_media(token=token, show_id=SHOW_ID, file_name=enhanced_file)
+    print("uploading media: ")
+    media_id = upload_media(token=token, show_id=SHOW_ID, file_name=info["file_name"])
     print("creating podcast")
     episode_url = create_podcast(
         token=token,
@@ -214,8 +216,6 @@ def audio_to_captivateFM(info):
         shows_id=SHOW_ID,
     )
     print(episode_url)
-    spotify_link = get_spotify_link_for_podcast(info["title"], PLS_SPOTIFY_ID)
-    print(spotify_link)
 
 
 if __name__ == "__main__":
