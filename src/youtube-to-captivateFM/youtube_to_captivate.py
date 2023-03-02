@@ -1,48 +1,34 @@
 #!/usr/bin/python
 
-import os
 import asyncio
 from datetime import datetime
 
 from dotenv import load_dotenv
 
 from adobe_podcast import enhance_podcast
-from audio_conversion import combine_mp3_files, create_video_from_audio_and_picture, combine_webm_files
-from captivate_api import (
-    create_podcast,
-    format_date,
-    get_episode,
-    get_token,
-    update_podcast,
-    upload_media,
-)
-from download_yt import download_youtube_video
-from spotify import get_spotify_access_token, get_latest_spotify_episode_link
-from upload_video import upload_video_with_options
 from anchorFM import post_episode_anchorfm
+from audio_conversion import (combine_mp3_files, combine_webm_files,
+                              create_video_from_audio_and_picture)
+from captivate_api import (create_podcast, format_date, get_episode, get_token,
+                           update_podcast, upload_media)
+from configuration_manager import ConfigurationManager
+from download_yt import download_youtube_video
+from spotify import get_latest_spotify_episode_link, get_spotify_access_token
+from upload_video import upload_video_with_options
 
 load_dotenv()
 
-USER_ID = os.getenv("USER_ID")
-API_KEY = os.getenv("CAPTIVATE_API_KEY")
-SHOW_ID = os.getenv("SHOWS_ID")
-DATA_DIR = os.getenv("DATA_DIR")
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-KOLEL_SPOTIFY_ID = os.getenv("KOLEL_SPOTIFY_ID")
-PLS_SPOTIFY_ID = os.getenv("PLS_SPOTIFY_ID")
-ANCHOR_EMAIL = os.getenv("ANCHOR_EMAIL")
-ANCHOR_PASSWORD = os.getenv("ANCHOR_PASSWORD")
+config = ConfigurationManager()
 
 
 def get_spotify_link_for_podcast(podcast_name: str, channel_id):
-    access_token = get_spotify_access_token(CLIENT_ID, CLIENT_SECRET)
+    access_token = get_spotify_access_token(config.CLIENT_ID, config.CLIENT_SECRET)
     link = get_latest_spotify_episode_link(podcast_name, channel_id, access_token)
     return link
 
 
 def likutei_torah_shiur(url: str):
-    info = download_youtube_video(url, DATA_DIR)
+    info = download_youtube_video(url, config.DATA_DIR)
     print(info["file_name"])
     print("Enhancing audio quality")
     info["file_name"] = enhance_podcast(info["file_name"])
@@ -50,15 +36,15 @@ def likutei_torah_shiur(url: str):
     asyncio.run(
         post_episode_anchorfm(
             info,
-            ANCHOR_EMAIL,
-            ANCHOR_PASSWORD,
+            config.ANCHOR_EMAIL,
+            config.ANCHOR_PASSWORD,
             PUPETEER_HEADLESS=False,
             URL_IN_DESCRIPTION=False,
             LOAD_THUMBNAIL="shloimy.jpg",
             SAVE_AS_DRAFT=False,
         )
     )
-    spotify_link = get_spotify_link_for_podcast(info["title"], KOLEL_SPOTIFY_ID)
+    spotify_link = get_spotify_link_for_podcast(info["title"], config.KOLEL_SPOTIFY_ID)
 
     post_message = """
 {title}
@@ -97,8 +83,8 @@ Topics include:
     asyncio.run(
         post_episode_anchorfm(
             podcast_info,
-            ANCHOR_EMAIL,
-            ANCHOR_PASSWORD,
+            config.ANCHOR_EMAIL,
+            config.ANCHOR_PASSWORD,
             PUPETEER_HEADLESS=False,
             URL_IN_DESCRIPTION=False,
             LOAD_THUMBNAIL=picture,
@@ -113,17 +99,17 @@ Topics include:
 
     youtube_link = input("What is the youtube link? ")
     print("======\n\n")
-    spotify_link = get_spotify_link_for_podcast(title, KOLEL_SPOTIFY_ID)
+    spotify_link = get_spotify_link_for_podcast(title, config.KOLEL_SPOTIFY_ID)
 
     post_message = description + f"\nyoutube - {youtube_link}\nspotify - {spotify_link}"
     print(post_message)
 
 
 def download2_and_enhance(url1: str, url2: str) -> str:
-    info1 = download_youtube_video(url1, DATA_DIR)
+    info1 = download_youtube_video(url1, config.DATA_DIR)
     file1 = info1["file_name"]
     print(file1)
-    info2 = download_youtube_video(url1, DATA_DIR)
+    info2 = download_youtube_video(url1, config.DATA_DIR)
     file2 = info2["file_name"]
     print(file2)
     combined = combine_webm_files(file1, file2)
@@ -132,7 +118,7 @@ def download2_and_enhance(url1: str, url2: str) -> str:
 
 
 def download_and_enhance(url: str) -> str:
-    info = download_youtube_video(url, DATA_DIR)
+    info = download_youtube_video(url, config.DATA_DIR)
     print(info["file_name"])
     print("Enhancing audio quality")
     enhanced_file = enhance_podcast(info["file_name"])
@@ -141,21 +127,21 @@ def download_and_enhance(url: str) -> str:
 
 
 def add_audio_to_podcast(file_path_1, url, episode_id):
-    info = download_youtube_video(url, DATA_DIR)
+    info = download_youtube_video(url, config.DATA_DIR)
     print("Enhancing audio quality")
     file_path_2 = enhance_podcast(info["file_name"])
     print("Combining audio files")
     combined = combine_mp3_files(file_path_1, file_path_2)
     print("getting user token")
-    token = get_token(user_id=USER_ID, api_key=API_KEY)
+    token = get_token(user_id=config.USER_ID, api_key=config.API_KEY)
     print("uploading media: " + combined)
-    media_id = upload_media(token=token, show_id=SHOW_ID, file_name=combined)
+    media_id = upload_media(token=token, show_id=config.SHOW_ID, file_name=combined)
     print(media_id)
     episode = get_episode(token, episode_id)
     episode_url = update_podcast(
         token=token,
         media_id=media_id,
-        shows_id=SHOW_ID,
+        shows_id=config.SHOW_ID,
         episode_id=episode_id,
         shownotes=episode["shownotes"],
         title=episode["title"],
@@ -170,8 +156,7 @@ def add_audio_to_podcast(file_path_1, url, episode_id):
 
 def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.jpg"):
     print("Enhancing audio quality")
-    # enhanced_file = enhance_podcast(info["file_name"])
-    enhanced_file = file
+    enhanced_file = enhance_podcast(file)
     print(enhanced_file)
 
     today = datetime.today()
@@ -185,14 +170,14 @@ def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.
     }
     audio_to_captivateFM(info)
     file = create_video_from_audio_and_picture(file, picture, "data/" + title + ".mp4")
-    spotify_link = get_spotify_link_for_podcast(info["title"], PLS_SPOTIFY_ID)
+    spotify_link = get_spotify_link_for_podcast(info["title"], config.PLS_SPOTIFY_ID)
     print(spotify_link)
     print("Uploading to YouTube")
     upload_video_with_options(file, title, description=info["description"], privacyStatus="public")
 
 
 def youtube_to_captivateFM(url: str):
-    info = download_youtube_video(url, DATA_DIR)
+    info = download_youtube_video(url, config.DATA_DIR)
     print(info["file_name"])
     print("Enhancing audio quality")
     enhanced_file = enhance_podcast(info["file_name"])
@@ -203,9 +188,9 @@ def youtube_to_captivateFM(url: str):
 def audio_to_captivateFM(info):
     formatted_upload_date = format_date(info["upload_date"])
     print("getting user token")
-    token = get_token(user_id=USER_ID, api_key=API_KEY)
+    token = get_token(user_id=config.USER_ID, api_key=config.API_KEY)
     print("uploading media: ")
-    media_id = upload_media(token=token, show_id=SHOW_ID, file_name=info["file_name"])
+    media_id = upload_media(token=token, show_id=config.SHOW_ID, file_name=info["file_name"])
     print("creating podcast")
     episode_url = create_podcast(
         token=token,
@@ -213,7 +198,7 @@ def audio_to_captivateFM(info):
         date=formatted_upload_date,
         title=info["title"],
         shownotes=info["description"] + "\n" + info["url"],
-        shows_id=SHOW_ID,
+        shows_id=config.SHOW_ID,
     )
     print(episode_url)
 
