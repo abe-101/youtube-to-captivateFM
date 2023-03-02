@@ -22,7 +22,6 @@ config = ConfigurationManager()
 def likutei_torah_shiur(url: str):
     info = download_youtube_video(url, config.DATA_DIR)
     info["file_name"] = enhance_podcast(info["file_name"])
-
     asyncio.run(
         post_episode_anchorfm(
             info,
@@ -32,8 +31,7 @@ def likutei_torah_shiur(url: str):
             SAVE_AS_DRAFT=False,
         )
     )
-    spotify_link = get_latest_spotify_episode_link(
-        info["title"], config.KOLEL_SPOTIFY_ID, config)
+    spotify_link = get_latest_spotify_episode_link(info["title"], config.KOLEL_SPOTIFY_ID, config)
 
     post_message = """
 {title}
@@ -46,17 +44,16 @@ spotify - {spotify}
     print(post_message)
 
 
-def the_daily_halacha_shiur(file: str, title: str,
-                            picture: str = "halacha.jpg"):
+def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg"):
     description = """Carpool Halacha
 
 *The Laws of Mishaloach Manos, Matanos La’evyonim, and the Purim meal*
 ({title})
-Topics include:
+Topics Include
 
-- What is my exact obligation in Shalach Manos
-- Someone who lives off Tzdukah, does he still need to give Matanus Lievyonim
-- Should I investigate where my monies go to on Purim
+- Is it proper for a woman to give a man Shalach Manos
+- What’s my obligation of eating a meal on 14th at night
+- When should I give Matanos La’evyonim
 """.format(
         title=title
     )
@@ -79,18 +76,15 @@ Topics include:
         )
     )
 
-    file = create_video_from_audio_and_picture(
-        file, picture, "data/halacha/" + title + ".mp4")
+    file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     # print("Uploading to YouTube")
     # upload_video_with_options(file, title, description=daily_halacha, privacyStatus="public")
 
     youtube_link = input("What is the youtube link? ")
     print("======\n\n")
-    spotify_link = get_latest_spotify_episode_link(
-        title, config.KOLEL_SPOTIFY_ID, config)
+    spotify_link = get_latest_spotify_episode_link(title, config.KOLEL_SPOTIFY_ID, config)
 
-    post_message = description + \
-        f"\nyoutube - {youtube_link}\nspotify - {spotify_link}"
+    post_message = description + f"\nyoutube - {youtube_link}\nspotify - {spotify_link}"
     print(post_message)
 
 
@@ -114,16 +108,13 @@ def add_audio_to_podcast(file_path_1, url, episode_id):
     info = download_youtube_video(url, config.DATA_DIR)
     file_path_2 = enhance_podcast(info["file_name"])
     combined = combine_mp3_files(file_path_1, file_path_2)
-    media_id = upload_media(
-        config=config,
-        show_id=config.SHOW_ID,
-        file_name=combined)
+    media_id = upload_media(config=config, show_id=config.SHOWS_ID, file_name=combined)
     print(media_id)
     episode = get_episode(config, episode_id)
     episode_url = update_podcast(
         config=config,
         media_id=media_id,
-        shows_id=config.SHOW_ID,
+        shows_id=config.SHOWS_ID,
         episode_id=episode_id,
         shownotes=episode["shownotes"],
         title=episode["title"],
@@ -136,8 +127,7 @@ def add_audio_to_podcast(file_path_1, url, episode_id):
     print(episode_url)
 
 
-def pls_create_video_and_podcast(
-        file: str, title: str, picture: str = "shloimy.jpg"):
+def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.jpg"):
     enhanced_file = enhance_podcast(file)
 
     today = datetime.today()
@@ -150,13 +140,9 @@ def pls_create_video_and_podcast(
         "url": "",
     }
     audio_to_captivateFM(info)
-    file = create_video_from_audio_and_picture(
-        file, picture, "data/" + title + ".mp4")
-    spotify_link = get_latest_spotify_episode_link(
-        info["title"], config.PLS_SPOTIFY_ID, config)
-    upload_video_with_options(
-        file, title, description=info["description"],
-        privacyStatus="public")
+    file = create_video_from_audio_and_picture(file, picture, "data/" + title + ".mp4")
+    spotify_link = get_latest_spotify_episode_link(info["title"], config.PLS_SPOTIFY_ID, config)
+    upload_video_with_options(file, title, description=info["description"], privacyStatus="public")
 
 
 def youtube_to_captivateFM(url: str):
@@ -167,17 +153,14 @@ def youtube_to_captivateFM(url: str):
 
 def audio_to_captivateFM(info):
     formatted_upload_date = format_date(info["upload_date"])
-    media_id = upload_media(
-        config=config,
-        show_id=config.SHOW_ID,
-        file_name=info["file_name"])
+    media_id = upload_media(config=config, show_id=config.SHOWS_ID, file_name=info["file_name"])
     episode_url = create_podcast(
         config=config,
         media_id=media_id,
         date=formatted_upload_date,
         title=info["title"],
         shownotes=info["description"] + "\n" + info["url"],
-        shows_id=config.SHOW_ID,
+        shows_id=config.SHOWS_ID,
     )
     print(episode_url)
 
