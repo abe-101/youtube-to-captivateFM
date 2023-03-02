@@ -3,6 +3,8 @@ from typing import Union
 
 import requests
 
+from configuration_manager import ConfigurationManager
+
 
 def format_date(date_str: str) -> Union[str, None]:
     """
@@ -26,40 +28,7 @@ def format_date(date_str: str) -> Union[str, None]:
         return None
 
 
-def get_token(user_id: str, api_key: str) -> Union[str, None]:
-    """
-    This function gets a token from the captivate.fm API, using the user_id and api_key as authentication.
-
-    :param user_id: The user_id of the account to get a token for
-    :type user_id: str
-    :param api_key: The api_key for the account
-    :type api_key: str
-    :return: The token from the API
-    :rtype: Union[str, None]
-    :raise: Exception if the API request fails.
-    """
-    url = "https://api.captivate.fm/authenticate/token"
-
-    payload = {"username": user_id, "token": api_key}
-    files = []
-    headers = {}
-
-    try:
-        response = requests.request(
-            "POST",
-            url,
-            headers=headers,
-            data=payload,
-            files=files)
-        response.raise_for_status()
-        r = response.json()
-        return r["user"]["token"]
-    except requests.exceptions.HTTPError as error:
-        print(f"An HTTP error occurred: {error}")
-        return
-
-
-def upload_media(token: str, show_id: str, file_name: str) -> Union[str, None]:
+def upload_media(config: ConfigurationManager, show_id: str, file_name: str) -> Union[str, None]:
     """
     This function uploads a file to captivate.fm using an API, and returns the media_id.
 
@@ -73,6 +42,7 @@ def upload_media(token: str, show_id: str, file_name: str) -> Union[str, None]:
     :rtype: Union[str, None]
     :raise: Exception if the file upload fails.
     """
+    token = config.get_captivate_token()
     headers = {
         "Authorization": "Bearer " + token,
     }
@@ -99,7 +69,7 @@ def upload_media(token: str, show_id: str, file_name: str) -> Union[str, None]:
 
 
 def create_podcast(
-    token: str,
+    config: ConfigurationManager,
     title: str,
     media_id: str,
     date: str,
@@ -132,6 +102,7 @@ def create_podcast(
     :type episode_number: str
 
     """
+    token = config.get_captivate_token()
     url = "https://api.captivate.fm/episodes"
 
     payload = {
@@ -149,12 +120,7 @@ def create_podcast(
     headers = {"Authorization": "Bearer " + token}
 
     try:
-        response = requests.request(
-            "POST",
-            url,
-            headers=headers,
-            data=payload,
-            files=files)
+        response = requests.request("POST", url, headers=headers, data=payload, files=files)
         response.raise_for_status()
         r = response.json()
         episode_id = r["record"]["id"]
@@ -165,7 +131,7 @@ def create_podcast(
         return None
 
 
-def get_episode(token: str, episode_id: str) -> Union[dict, None]:
+def get_episode(config: ConfigurationManager, episode_id: str) -> Union[dict, None]:
     """
     This function gets the full information for a episode
 
@@ -177,6 +143,7 @@ def get_episode(token: str, episode_id: str) -> Union[dict, None]:
     :rtype: Union[dict, None]
     :raise: Exception if the file upload fails.
     """
+    token = config.get_captivate_token()
     url = f"https://api.captivate.fm/episodes/{episode_id}"
     headers = {
         "Authorization": "Bearer " + token,
@@ -195,7 +162,7 @@ def get_episode(token: str, episode_id: str) -> Union[dict, None]:
 
 
 def update_podcast(
-    token: str,
+    config: ConfigurationManager,
     media_id: str,
     shows_id: str,
     episode_id: str,
@@ -206,6 +173,7 @@ def update_podcast(
     episode_season: str = "1",
     episode_number: str = "1",
 ) -> Union[str, None]:
+    token = config.get_captivate_token()
     url = f"https://api.captivate.fm/episodes/{episode_id}"
 
     payload = {
@@ -223,12 +191,7 @@ def update_podcast(
     headers = {"Authorization": "Bearer " + token}
 
     try:
-        response = requests.request(
-            "PUT",
-            url,
-            headers=headers,
-            data=payload,
-            files=files)
+        response = requests.request("PUT", url, headers=headers, data=payload, files=files)
         response.raise_for_status()
         r = response.json()
         episode_id = r["episode"]["id"]

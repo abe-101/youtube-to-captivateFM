@@ -3,8 +3,10 @@ import time
 
 import requests
 
+from configuration_manager import ConfigurationManager
 
-def get_spotify_access_token(client_id: str, client_secret: str) -> str:
+
+def _get_spotify_access_token(client_id: str, client_secret: str) -> str:
     """
     Retrieve an access token from the Spotify API using the provided client ID and client secret.
 
@@ -37,7 +39,7 @@ def get_spotify_access_token(client_id: str, client_secret: str) -> str:
     return access_token
 
 
-def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, access_token: str) -> str:
+def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, config: ConfigurationManager) -> str:
     """
     Retrieve the latest Spotify episode link for a given podcast channel and episode name using the provided access token.
 
@@ -47,13 +49,13 @@ def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, 
     :param podcast_channel_id: The ID of the podcast channel to retrieve the link from.
     :type podcast_channel_id: str
 
-    :param access_token: The access token for the Spotify API.
-    :type access_token: str
+    :param config: The config object with env secrets
+    :type config: ConfigurationManager
 
     :return: The latest Spotify episode link for the given podcast channel and episode name.
     :rtype: str
     """
-
+    access_token = _get_spotify_access_token(config.CLIENT_ID, config.CLIENT_SECRET)
     count = 5
     while count > 0:
         url = f"https://api.spotify.com/v1/shows/{podcast_channel_id}/episodes?market=us"
@@ -63,12 +65,10 @@ def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, 
         for i in range(5):
             episode = response["items"][i]
             if episode["name"] == episode_name:
-                return episode["external_urls"]["spotify"]
+                episode_link = episode["external_urls"]["spotify"]
+                print(f"Found Spotify link for {episode_name}\n{episode_link}")
+                return episode_link
         print(f"episode: {episode_name} not yet found on {podcast_channel_id}")
         count -= 1
         print("waiting 2 minutes to try again")
         time.sleep(120)
-
-    # Return the link of the latest episode
-    # latest_episode = response['episodes']['items'][0]
-    # return latest_episode['external_urls']['spotify']

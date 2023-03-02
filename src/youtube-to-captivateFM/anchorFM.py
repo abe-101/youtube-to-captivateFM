@@ -1,42 +1,7 @@
 import asyncio
 
 from pyppeteer import launch
-
-# from dotenv import load_dotenv
-#
-# load_dotenv()
-#
-#
-# class Env:
-#    default_values = {
-#        "EPISODE_PATH": ".",
-#        "ANCHOR_EMAIL": "",
-#        "ANCHOR_PASSWORD": "",
-#        "UPLOAD_TIMEOUT": 60 * 5 * 1000,
-#        "SAVE_AS_DRAFT": False,
-#        "LOAD_THUMBNAIL": False,
-#        "IS_EXPLICIT": False,
-#        "URL_IN_DESCRIPTION": False,
-#        "POSTPROCESSOR_ARGS": "",
-#        "SET_PUBLISH_DATE": False,
-#        # "AUDIO_FILE_FORMAT": "mp3",
-#        # "AUDIO_FILE_TEMPLATE": "episode.%(ext)s",
-#        # "THUMBNAIL_FILE_FORMAT": "jpg",
-#        # "THUMBNAIL_FILE_TEMPLATE": "thumbnail.%(ext)s",
-#        "PUPETEER_HEADLESS": True,
-#    }
-#
-#    def __getattr__(self, name):
-#        value = os.environ.get(name, self.default_values.get(name))
-#        if value is None:
-#            raise AttributeError(f"Undefined environment variable {name}")
-#        return value
-#
-#    def __setattr__(self, name, value):
-#        raise NotImplementedError("Cannot modify environment variables")
-#
-#
-# env = Env()
+from configuration_manager import ConfigurationManager
 
 
 def addUrlToDescription(youtube_video_info, URL_IN_DESCRIPTION: bool):
@@ -117,12 +82,9 @@ async def selectDayInDatePicker(page, navigationPromise, day):
     await navigationPromise
 
 
-# async def post_episode_anchorfm(youtubeVideoInfo, url_description: bool = True,):
 async def post_episode_anchorfm(
     youtubeVideoInfo,
-    ANCHOR_EMAIL: str = None,
-    ANCHOR_PASSWORD: str = None,
-    PUPETEER_HEADLESS: bool = True,
+    config: ConfigurationManager,
     URL_IN_DESCRIPTION: bool = True,
     SET_PUBLISH_DATE: bool = False,
     IS_EXPLICIT: bool = False,
@@ -130,20 +92,20 @@ async def post_episode_anchorfm(
     SAVE_AS_DRAFT: bool = True,
     UPLOAD_TIMEOUT: int = 60 * 5 * 1000,
 ):
-    if ANCHOR_EMAIL is None or ANCHOR_PASSWORD is None:
+    if config.ANCHOR_EMAIL is None or config.ANCHOR_PASSWORD is None:
         print("please provide username and password for anchorFM")
         return
 
     print("Launching Pyppeteer")
-    browser = await launch(args=["--no-sandbox"], headless=PUPETEER_HEADLESS)
+    browser = await launch(args=["--no-sandbox"], headless=config.PUPETEER_HEADLESS)
     page = await browser.newPage()
 
     await page.goto("https://anchor.fm/dashboard/episode/new")
     await page.setViewport({"width": 1600, "height": 789})
 
     print("Trying to log in")
-    await page.type("#email", ANCHOR_EMAIL)
-    await page.type("#password", ANCHOR_PASSWORD)
+    await page.type("#email", config.ANCHOR_EMAIL)
+    await page.type("#password", config.ANCHOR_PASSWORD)
     await page.click("button[type=submit]")
     await page.waitForNavigation()
     print("Logged in")

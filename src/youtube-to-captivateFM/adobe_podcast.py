@@ -10,10 +10,12 @@ def run(playwright: Playwright, file_name: str) -> None:
     new_file = file_name.rsplit(".", 1)[0] + " (enhanced).mp3"
     # check if file was already enhanced
     if os.path.exists(new_file):
-        print(f"file: {file_name} was already enhanced, skipping")
+        print(f"file: {file_name}\n---\n   \ was already enhanced, skipping")
         return new_file
+
+    print(f"Enhancing file {file_name}")
     # Launch the chromium browser
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch()
 
     # Create a new context with saved authentication information
     # For first-time users, sign in manually and save the session and cookies using the command:
@@ -46,6 +48,7 @@ def run(playwright: Playwright, file_name: str) -> None:
     context.close()
     browser.close()
 
+    print(f"========\nSuccess!\n========\n\n{new_file}\n___\n   \ has been enhanced!\n___/")
     return new_name
 
 
@@ -59,4 +62,3 @@ if __name__ == "__main__":
     # Prompts the user for the audio file to enhance
     file_name = input("Which file would you like to enhance? ")
     new_file = enhance_podcast(file_name)
-    print(new_file)
