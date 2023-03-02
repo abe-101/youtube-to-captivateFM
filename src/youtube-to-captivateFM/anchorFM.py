@@ -139,7 +139,6 @@ async def post_episode_anchorfm(
 
     await page.goto("https://anchor.fm/dashboard/episode/new")
     await page.setViewport({"width": 1600, "height": 789})
-    navigationPromise = await page.waitForNavigation()
 
     print("Trying to log in")
     await page.type("#email", ANCHOR_EMAIL)
@@ -174,7 +173,7 @@ async def post_episode_anchorfm(
     await page.type('div[role="textbox"]', finalDescription)
 
     if SET_PUBLISH_DATE:
-        await setPublishDate(page, navigationPromise, youtubeVideoInfo["uploadDate"])
+        await setPublishDate(page, page.waitForNavigation(), youtubeVideoInfo["uploadDate"])
 
     print("-- Selecting content type")
     selectorForExplicitContentLabel = (
