@@ -51,9 +51,9 @@ def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg")
 ({title})
 Topics Include
 
-- Is it proper for a woman to give a man Shalach Manos
-- What’s my obligation of eating a meal on 14th at night
-- When should I give Matanos La’evyonim
+- Why are we obligated to intoxicate ourself on Purim.
+- What if I can’t handle alcohol
+- laws of a mourner sending or receiving Shalach Manos
 """.format(
         title=title
     )
@@ -80,6 +80,7 @@ Topics Include
     # print("Uploading to YouTube")
     # upload_video_with_options(file, title, description=daily_halacha, privacyStatus="public")
 
+    print(description)
     youtube_link = input("What is the youtube link? ")
     print("======\n\n")
     spotify_link = get_latest_spotify_episode_link(title, config.KOLEL_SPOTIFY_ID, config)
