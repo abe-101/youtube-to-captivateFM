@@ -16,7 +16,7 @@ class ConfigurationManager:
         self.PLS_SPOTIFY_ID = os.getenv("PLS_SPOTIFY_ID")
         self.ANCHOR_EMAIL = os.getenv("ANCHOR_EMAIL")
         self.ANCHOR_PASSWORD = os.getenv("ANCHOR_PASSWORD")
-        self.PUPETEER_HEADLESS = os.getenv("PUPETEER_HEADLESS")
+        self.PUPETEER_HEADLESS = bool(os.getenv("PUPETEER_HEADLESS"))
         self.CAPTIVATE_TOKEN = None
         self.SPOTIFY_TOKEN = None
 

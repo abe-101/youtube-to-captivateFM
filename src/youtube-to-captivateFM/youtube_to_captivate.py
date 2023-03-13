@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from adobe_podcast import enhance_podcast
 from anchorFM import post_episode_anchorfm
-from audio_conversion import combine_mp3_files, combine_webm_files, create_video_from_audio_and_picture
+from audio_conversion import combine_mp3_files, combine_webm_files, create_video_from_audio_and_picture, convert_wav_to_mp3
 from captivate_api import create_podcast, format_date, get_episode, update_podcast, upload_media
 from configuration_manager import ConfigurationManager
 from download_yt import download_youtube_video
@@ -26,7 +26,7 @@ def likutei_torah_shiur(url: str):
         post_episode_anchorfm(
             info,
             config,
-            URL_IN_DESCRIPTION=False,
+            URL_IN_DESCRIPTION=True,
             LOAD_THUMBNAIL="shloimy.jpg",
             SAVE_AS_DRAFT=False,
         )
@@ -36,8 +36,8 @@ def likutei_torah_shiur(url: str):
     post_message = """
 {title}
 
-youtube - {youtube}
-spotify - {spotify}
+YouTube - {youtube}
+Spotify - {spotify}
 """.format(
         title=info["title"], youtube=info["url"], spotify=spotify_link
     )
@@ -47,13 +47,13 @@ spotify - {spotify}
 def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg"):
     description = """Carpool Halacha
 
-*The Laws of Mishaloach Manos, Matanos La’evyonim, and the Purim meal*
 ({title})
-Topics Include
+The laws of Wheat and Flour for the Matzos
 
-- Why are we obligated to intoxicate ourself on Purim.
-- What if I can’t handle alcohol
-- laws of a mourner sending or receiving Shalach Manos
+Topics include:
+- what happeneds if the flour becomes wet
+- waiting longer to use the flour once ground
+- places the flour should be laid on
 """.format(
         title=title
     )
@@ -85,7 +85,7 @@ Topics Include
     print("======\n\n")
     spotify_link = get_latest_spotify_episode_link(title, config.KOLEL_SPOTIFY_ID, config)
 
-    post_message = description + f"\nyoutube - {youtube_link}\nspotify - {spotify_link}"
+    post_message = description + f"\nYouTube - {youtube_link}\nSpotify - {spotify_link}"
     print(post_message)
 
 
@@ -148,7 +148,7 @@ def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.
 
 def youtube_to_captivateFM(url: str):
     info = download_youtube_video(url, config.DATA_DIR)
-    enhanced_file = enhance_podcast(info["file_name"])
+    info["file_name"] = enhance_podcast(info["file_name"])
     audio_to_captivateFM(info)
 
 

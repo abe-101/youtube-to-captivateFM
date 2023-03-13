@@ -90,7 +90,7 @@ async def post_episode_anchorfm(
     IS_EXPLICIT: bool = False,
     LOAD_THUMBNAIL: str = None,
     SAVE_AS_DRAFT: bool = True,
-    UPLOAD_TIMEOUT: int = 60 * 5 * 1000,
+    UPLOAD_TIMEOUT: int = 60000,
 ):
     if config.ANCHOR_EMAIL is None or config.ANCHOR_PASSWORD is None:
         print("please provide username and password for anchorFM")
@@ -100,8 +100,11 @@ async def post_episode_anchorfm(
     browser = await launch(args=["--no-sandbox"], headless=config.PUPETEER_HEADLESS)
     page = await browser.newPage()
 
-    await page.goto("https://anchor.fm/dashboard/episode/new")
+    await page.goto("https://podcasters.spotify.com/pod/dashboard/episode/new")
     await page.setViewport({"width": 1600, "height": 789})
+
+    print("Trying to login")
+    await page.waitForSelector('#email')
 
     print("Trying to log in")
     await page.type("#email", config.ANCHOR_EMAIL)
