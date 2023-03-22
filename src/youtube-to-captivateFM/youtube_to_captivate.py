@@ -6,8 +6,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 from adobe_podcast import enhance_podcast
-from anchorFM import post_episode_anchorfm
-from audio_conversion import combine_mp3_files, combine_webm_files, create_video_from_audio_and_picture, convert_wav_to_mp3
+from spotify_podcasters import upload_to_spotify_podcasters
+from audio_conversion import (
+    combine_mp3_files,
+    combine_webm_files,
+    create_video_from_audio_and_picture,
+    convert_wav_to_mp3,
+)
 from captivate_api import create_podcast, format_date, get_episode, update_podcast, upload_media
 from configuration_manager import ConfigurationManager
 from download_yt import download_youtube_video
@@ -48,12 +53,14 @@ def the_daily_halacha_shiur(file: str, title: str, picture: str = "halacha.jpg")
     description = """Carpool Halacha
 
 ({title})
-The laws of Wheat and Flour for the Matzos
+The search and nullification of the Chametz 
 
-Topics include:
-- what happeneds if the flour becomes wet
-- waiting longer to use the flour once ground
-- places the flour should be laid on
+Topics include 
+
+- Proper time we check for Chametz 
+- Which candle best to use 
+- Where must one check
+- Rooms sold to a goy do they require checking?
 """.format(
         title=title
     )
@@ -65,16 +72,9 @@ Topics include:
         "file_name": file,
         "upload_date": None,
         "url": None,
+        "thumbnail": picture,
     }
-    asyncio.run(
-        post_episode_anchorfm(
-            podcast_info,
-            config=config,
-            URL_IN_DESCRIPTION=False,
-            LOAD_THUMBNAIL=picture,
-            SAVE_AS_DRAFT=False,
-        )
-    )
+    upload_to_spotify_podcasters(podcast_info, config)
 
     file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     # print("Uploading to YouTube")
@@ -97,6 +97,20 @@ def download2_and_enhance(url1: str, url2: str) -> str:
     combined = combine_webm_files(file1, file2)
     enhanced_file = enhance_podcast(combined)
     return enhanced_file
+
+
+def download_combine_and_enhance(url: str, file: str) -> str:
+    info = download_youtube_video(url, config.DATA_DIR)
+    combined = combine_mp3_files(info["file_name"], file)
+    enhanced_file = enhance_podcast(combined)
+    return combined
+
+
+def download_enhance_and_combine(url: str, file: str) -> str:
+    info = download_youtube_video(url, config.DATA_DIR)
+    enhanced_file = enhance_podcast(info["file_name"])
+    combined = combine_mp3_files(file, enhanced_file)
+    return combined
 
 
 def download_and_enhance(url: str) -> str:
@@ -163,8 +177,10 @@ def audio_to_captivateFM(info):
         shownotes=info["description"] + "\n" + info["url"],
         shows_id=config.SHOWS_ID,
     )
+    spotify_link = get_latest_spotify_episode_link(info["title"], config.PLS_SPOTIFY_ID, config)
     print(episode_url)
+    print(spotify_link)
 
 
-if __name__ == "__main__":
-    youtube_to_captivateFM(input("Enter url of youtube video: "))
+# if __name__ == "__main__":
+#    youtube_to_captivateFM(input("Enter url of youtube video: "))
