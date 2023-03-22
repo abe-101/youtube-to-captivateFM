@@ -16,9 +16,12 @@ class ConfigurationManager:
         self.PLS_SPOTIFY_ID = os.getenv("PLS_SPOTIFY_ID")
         self.ANCHOR_EMAIL = os.getenv("ANCHOR_EMAIL")
         self.ANCHOR_PASSWORD = os.getenv("ANCHOR_PASSWORD")
-        self.PUPETEER_HEADLESS = bool(os.getenv("PUPETEER_HEADLESS"))
+        self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False
+        self.LOAD_THUMBNAIL = True if os.getenv("LOAD_THUMBNAIL") == "True" else False
+        self.PUPETEER_HEADLESS = False
         self.CAPTIVATE_TOKEN = None
         self.SPOTIFY_TOKEN = None
+        self.SPOTIFY_PODCAST_PUBLISH = True if os.getenv("SPOTIFY_PODCAST_PUBLISH") == "True" else False
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:
