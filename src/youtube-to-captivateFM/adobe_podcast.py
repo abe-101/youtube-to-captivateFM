@@ -3,10 +3,11 @@ import os
 from playwright.sync_api import Playwright, sync_playwright
 
 from audio_conversion import convert_wav_to_mp3
+from configuration_manager import ConfigurationManager
 
 
 # Function to run the audio enhancement process using Adobe Podcast
-def run(playwright: Playwright, file_name: str) -> None:
+def run(playwright: Playwright, file_name: str, config: ConfigurationManager) -> None:
     new_file = file_name.rsplit(".", 1)[0] + " (enhanced).mp3"
     # check if file was already enhanced
     if os.path.exists(new_file):
@@ -15,7 +16,7 @@ def run(playwright: Playwright, file_name: str) -> None:
 
     print(f"Enhancing file {file_name}")
     # Launch the chromium browser
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=config.PLAYWRITE_HEADLESS)
 
     # Create a new context with saved authentication information
     # For first-time users, sign in manually and save the session and cookies using the command:
@@ -52,13 +53,19 @@ def run(playwright: Playwright, file_name: str) -> None:
     return new_name
 
 
-def enhance_podcast(file_name: str) -> str:
+def enhance_podcast(file_name: str, config: ConfigurationManager) -> str:
     with sync_playwright() as playwright:
-        new_file = run(playwright, file_name)
+        new_file = run(playwright, file_name, config)
     return new_file
 
 
 if __name__ == "__main__":
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    
+    config = ConfigurationManager()
+
     # Prompts the user for the audio file to enhance
     file_name = input("Which file would you like to enhance? ")
-    new_file = enhance_podcast(file_name)
+    new_file = enhance_podcast(file_name,  config)

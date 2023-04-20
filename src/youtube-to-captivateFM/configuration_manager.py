@@ -22,6 +22,7 @@ class ConfigurationManager:
         self.CAPTIVATE_TOKEN = None
         self.SPOTIFY_TOKEN = None
         self.SPOTIFY_PODCAST_PUBLISH = True if os.getenv("SPOTIFY_PODCAST_PUBLISH") == "True" else False
+        self.SOTA_DIR = os.getenv("SOTA_DIR")
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:

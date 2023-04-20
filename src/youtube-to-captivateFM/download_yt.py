@@ -18,6 +18,7 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
         {
             "format": "bestaudio/best",
             "outtmpl": f"{folder_path}/%(title)s.%(ext)s",
+            'keepvideo': True,
             "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}],
         }
     ) as ydl:

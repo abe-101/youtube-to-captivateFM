@@ -14,7 +14,7 @@ def run(playwright: Playwright, info, config: ConfigurationManager) -> None:
     file_input.set_input_files(info["file_name"])
     
     print('Waiting for upload to finish')
-    page.wait_for_timeout(25000)
+    page.wait_for_timeout(80000)
 
     page.get_by_role("button", name="Save episode").click()
 
