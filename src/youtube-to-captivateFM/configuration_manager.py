@@ -23,6 +23,7 @@ class ConfigurationManager:
         self.SPOTIFY_TOKEN = None
         self.SPOTIFY_PODCAST_PUBLISH = True if os.getenv("SPOTIFY_PODCAST_PUBLISH") == "True" else False
         self.SOTA_DIR = os.getenv("SOTA_DIR")
+        self.YOUTUBE_API = os.getenv("YOUTUBE_API")
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:
