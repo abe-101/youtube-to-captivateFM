@@ -33,7 +33,6 @@ def get_links(video):
     post = prepare_sharable_post(links, video.id, video.name)
 
     print(embed)
-    print('\n\n')
     print(post)
 
 def publish_video(youtube_id: str):

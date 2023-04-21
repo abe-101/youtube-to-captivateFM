@@ -13,7 +13,7 @@ EPISODE_TITLE = "מסכת סוטה דף ב - Rabbi Shloime Greenwald"
 def get_episode_links(episode_title, config: ConfigurationManager):
     anchor_link = get_anchor_link(ANHCOR_RRS, episode_title)
     apple_link = get_apple_link(APPLE_URL, episode_title)
-    spotify_link = get_latest_spotify_episode_link(anchor_link, config.KOLEL_SPOTIFY_ID, config)
+    spotify_link = get_latest_spotify_episode_link(episode_title, config.KOLEL_SPOTIFY_ID, config)
     return {
         "anchor": anchor_link,
         "apple": apple_link,
@@ -101,8 +101,6 @@ To join the WhatsApp group, click here: https://chat.whatsapp.com/CuON9nbQvnWLap
 
 def prepare_sharable_post(links: dict, youtube_id: str, video_title: str):
     template = f'''
-Learn today's daf in Sota with Rabbi Shloimy Greenwald!
-
 {video_title}
 
 YouTube - https://www.youtube.com/watch?v={youtube_id}
