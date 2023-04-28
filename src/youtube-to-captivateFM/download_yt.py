@@ -1,4 +1,5 @@
 from typing import Dict
+from configuration_manager import LocalMedia
 
 from yt_dlp import YoutubeDL
 
@@ -23,10 +24,19 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
         }
     ) as ydl:
         video_info = ydl.extract_info(url)
-    return {
-        "title": video_info["title"],
-        "description": video_info.get("description"),
-        "file_name": video_info["requested_downloads"][0]["filepath"],
-        "upload_date": video_info.get("upload_date"),
-        "url": url,
-    }
+
+    local_media = LocalMedia(
+        file_name=video_info["requested_downloads"][0]["filepath"],
+        title=video_info["title"],
+        description=video_info.get("description"),
+        url=url,
+    )
+    local_media.set_upload_date_from_string(video_info.get("upload_date"))
+    return local_media
+    #return {
+    #    "title": video_info["title"],
+    #    "description": video_info.get("description"),
+    #    "file_name": video_info["requested_downloads"][0]["filepath"],
+    #    "upload_date": video_info.get("upload_date"),
+    #    "url": url,
+    #}

@@ -28,11 +28,19 @@ YOUTUBE_TO_ANCHORFM = os.getenv("YOUTUBE_TO_ANCHORFM_DIR")
 api_key = config.YOUTUBE_API
 
 def get_links(video):
-    links = get_episode_links(video.name, config)
-    embed = prepare_collive_embed(links)
+    show_names = [d for d in vars(config) if isinstance(vars(config)[d], dict)]
+    print("Choose a Podcast show: ")
+    for i, show in enumerate(show_names):
+        print(f'{i}: {show}')
+
+    show_num = int(input())
+    shows = [vars(config)[d] for d in vars(config) if isinstance(vars(config)[d], dict)]
+
+    links = get_episode_links(video.name, shows[show_num], config)
+    #embed = prepare_collive_embed(links)
     post = prepare_sharable_post(links, video.id, video.name)
 
-    print(embed)
+    #print(embed)
     print(post)
 
 def publish_video(youtube_id: str):

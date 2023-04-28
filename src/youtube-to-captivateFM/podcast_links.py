@@ -14,6 +14,7 @@ def get_episode_links(episode_title, show, config: ConfigurationManager):
     captivate_link = get_captivate_link(show["rss"], episode_title)
     apple_link = get_apple_link(show["apple_url"], episode_title)
     spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
+
     return {
         "captivate": captivate_link,
         "apple": apple_link,
@@ -28,7 +29,7 @@ def get_captivate_link(rss, episode_title):
     feed = feedparser.parse(rss_url)
     for episode in feed.entries:
         if episode["title"] == episode_title:
-            return "https://www.youtube.com/watch?v=" + episode["yt_videoid"]
+            return episode["link"]
     return None
 
 def get_apple_link(podcast_url, episode_title):

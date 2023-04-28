@@ -1,3 +1,4 @@
+from typing import Dict
 from datetime import datetime, time
 from typing import Union
 
@@ -196,7 +197,38 @@ def update_podcast(
         r = response.json()
         episode_id = r["episode"]["id"]
 
-        return f"https://player.captivate.fm/episode/{episode_id}"
+        return episode_id
     except requests.exceptions.HTTPError as error:
         print(f"An HTTP error occurred: {error}")
         return None
+
+
+def publish_podcast(info: Dict[str, str], show: Dict[str, str]) -> str:
+    """
+    Publishes an audio file as a new podcast episode on CaptivateFM.
+
+    Args:
+        info: A dictionary containing information about the podcast episode.
+            Required keys: "upload_date", "file_name", "title", "description", "url".
+        show: A dictionary containing information about the show.
+            Required keys: "show_id".
+
+    Returns:
+        The URL of the newly published podcast episode.
+
+    Raises:
+        ValueError: If any required keys are missing from the info or show dictionaries.
+    """
+    formatted_upload_date = format_date(info["upload_date"])
+    show_id = show["show_id"]
+    media_id = upload_media(config=config, show_id=show_id, file_name=info["file_name"])
+    episode_id = create_podcast(
+        config=config,
+        media_id=media_id,
+        date=formatted_upload_date,
+        title=info["title"],
+        shownotes=info["description"] + "\n" + info["url"],
+        shows_id=show_id,
+    )
+    return episode_id
+

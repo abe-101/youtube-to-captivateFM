@@ -3,6 +3,37 @@ import base64
 import requests
 from typing import Union
 
+from datetime import datetime
+
+class LocalMedia:
+    def __init__(self, file_name: str, title: str, description: str, thumbnail: str, upload_date: datetime):
+        self.file_name = file_name
+        self.title = title
+        self.description = description
+        self.url = None
+        self.thumbnail = thumbnail
+        self.upload_date = upload_date
+    
+    def __init__(self, file_name: str, title: str, url: str, description: str):
+        self.file_name = file_name
+        self.title = title
+        self.description = description
+        self.url = url
+        self.thumbnail = None
+        self.upload_date = datetime.now()
+
+    def __str__(self):
+        return f"Media: {self.title} ({self.file_name})\nDescription: {self.description}\nURL: {self.url}\nThumbnail: {self.thumbnail}\nUpload date: {self.upload_date}"
+
+    def set_upload_date_from_string(self, date_str: str):
+        try:
+            self.upload_date = datetime.strptime(date_str, "%Y%m%d")
+        except ValueError:
+            print("Error: Invalid date format. Use YYYYMMDD.")
+
+
+
+
 
 class ConfigurationManager:
     def __init__(self):
