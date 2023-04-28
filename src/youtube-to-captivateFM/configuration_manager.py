@@ -8,22 +8,47 @@ class ConfigurationManager:
     def __init__(self):
         self.CAPTIVATE_USER_ID = os.getenv("CAPTIVATE_USER_ID")
         self.CAPTIVATE_API_KEY = os.getenv("CAPTIVATE_API_KEY")
-        self.SHOWS_ID = os.getenv("SHOWS_ID")
+
+        self.pls = {
+            'show_id': os.getenv("PLS_SHOW_ID"),
+            'spotify_id': os.getenv("PLS_SPOTIFY_ID"),
+            'dir': os.getenv("PLS_DIR"),
+            'apple_url': os.getenv("PLS_APPLE_URL"),
+            'rss': os.getenv("PLS_RSS"),
+        }
+        self.sota = {
+            'show_id': os.getenv("SOTA_SHOW_ID"),
+            'spotify_id': os.getenv("SOTA_SPOTIFY_ID"),
+            'dir': os.getenv("SOTA_DIR"),
+            'apple_url': os.getenv("SOTA_APPLE_URL"),
+            'rss': os.getenv("SOTA_RSS"),
+        }
+        self.halacha = {
+            'show_id': os.getenv("HALACHA_SHOW_ID"),
+            'spotify_id': os.getenv("HALACHA_SPOTIFY_ID"),
+            'dir': os.getenv("HALACHA_DIR"),
+            'apple_url': os.getenv("HALACHA_APPLE_URL"),
+            'rss': os.getenv("HALACHA_RSS"),
+        }
+
+
         self.DATA_DIR = os.getenv("DATA_DIR")
+        self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False
+
         self.CLIENT_ID = os.getenv("CLIENT_ID")
         self.CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+
         self.KOLEL_SPOTIFY_ID = os.getenv("KOLEL_SPOTIFY_ID")
-        self.PLS_SPOTIFY_ID = os.getenv("PLS_SPOTIFY_ID")
+
         self.ANCHOR_EMAIL = os.getenv("ANCHOR_EMAIL")
         self.ANCHOR_PASSWORD = os.getenv("ANCHOR_PASSWORD")
-        self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False
         self.LOAD_THUMBNAIL = True if os.getenv("LOAD_THUMBNAIL") == "True" else False
         self.PUPETEER_HEADLESS = False
         self.CAPTIVATE_TOKEN = None
         self.SPOTIFY_TOKEN = None
         self.SPOTIFY_PODCAST_PUBLISH = True if os.getenv("SPOTIFY_PODCAST_PUBLISH") == "True" else False
-        self.SOTA_DIR = os.getenv("SOTA_DIR")
         self.YOUTUBE_API = os.getenv("YOUTUBE_API")
+        self.KOLEL_YOUTUBE_CHANNEL_ID = os.getenv("KOLEL_YOUTUBE_CHANNEL_ID")
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:

@@ -10,18 +10,26 @@ ANHCOR_RRS = 'https://anchor.fm/s/955ecec4/podcast/rss'
 EPISODE_TITLE = "מסכת סוטה דף ב - Rabbi Shloime Greenwald"
 
 
-def get_episode_links(episode_title, config: ConfigurationManager):
-    anchor_link = get_anchor_link(ANHCOR_RRS, episode_title)
-    apple_link = get_apple_link(APPLE_URL, episode_title)
-    spotify_link = get_latest_spotify_episode_link(episode_title, config.KOLEL_SPOTIFY_ID, config)
+def get_episode_links(episode_title, show, config: ConfigurationManager):
+    captivate_link = get_captivate_link(show["rss"], episode_title)
+    apple_link = get_apple_link(show["apple_url"], episode_title)
+    spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
     return {
-        "anchor": anchor_link,
+        "captivate": captivate_link,
         "apple": apple_link,
         "spotify": spotify_link
     }
 
 def get_youtube_id(youtube_channel, episode_title):
     pass
+
+def get_captivate_link(rss, episode_title):
+    rss_url = "https://feeds.captivate.fm/" + rss
+    feed = feedparser.parse(rss_url)
+    for episode in feed.entries:
+        if episode["title"] == episode_title:
+            return "https://www.youtube.com/watch?v=" + episode["yt_videoid"]
+    return None
 
 def get_apple_link(podcast_url, episode_title):
     """
