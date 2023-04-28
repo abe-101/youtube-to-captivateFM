@@ -63,9 +63,9 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
-    
+
     config = ConfigurationManager()
 
     # Prompts the user for the audio file to enhance
     file_name = input("Which file would you like to enhance? ")
-    new_file = enhance_podcast(file_name,  config)
+    new_file = enhance_podcast(file_name, config)

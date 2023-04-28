@@ -14,8 +14,8 @@ from audio_conversion import (
     create_video_from_audio_and_picture,
     convert_wav_to_mp3,
 )
-from captivate_api import create_podcast, format_date, get_episode, update_podcast, upload_media
-from configuration_manager import ConfigurationManager
+from captivate_api import create_podcast, format_date, get_episode, update_podcast, upload_media, publish_podcast
+from configuration_manager import ConfigurationManager, LocalMedia
 from download_yt import download_youtube_video
 from spotify import get_latest_spotify_episode_link
 from upload_video import upload_video_with_options
@@ -26,52 +26,32 @@ load_dotenv()
 config = ConfigurationManager()
 
 
-def meseches_sota_shiur(youtube_url: str = None, file: str = None, title: str = None, picture: str = "sota.jpg"):
-    description = """Looking for a comprehensive and in-depth study of Meseches Sota? Join Rabbi Shloimy Greenwald every day for a special 49-day learning program on this fascinating tractate.
+def meseches_sota_shiur(youtube_url: str, num_daf: int):
+    local_media: LocalMedia = download_youtube_video(youtube_url, config.sota["dir"])
 
-Check out the Kolel L'Horaah Maasis channel for daily shiurim by Rabbi Shloimy Greenwald. Available on all major platforms, including:
+    local_media.thumbnail = config.sota["dir"] + "square-lower/0"+str(num_daf)+".jpg"
+    
+    episode = publish_podcast(local_media, config.sota, config, episode_num=str(num_daf))
+    #upload_to_spotify_podcasters(info, config)
+    #if youtube_url is None:
+    #    file = create_video_from_audio_and_picture(info["file_name"], picture, config.SOTA_DIR + title + ".mp4")
+    #    print("Uploading to YouTube")
+    #    upload_video_with_options(file, title, description=description, privacyStatus="public")
 
-YouTube - https://www.youtube.com/c/kolellhoraahmaasis
+    #    youtube_url = input("What is the youtube link? ")
+    #    print("======\n\n")
 
-Apple Podcasts - https://podcasts.apple.com/us/podcast/kolel-lhoraah-maasis/id1670169956
+    # links = get_episode_links(title, config)
+    # daf = "ח"
+    #youtube_id = youtube_url[-11:]
+    #col = prepare_collive_embed(title, youtube_id)
+    # col = prepare_collive_post(links, daf, youtube_id)
+    # post = prepare_sharable_post(links, daf, youtube_id)
 
-Google Podcasts - https://podcasts.google.com/feed/aHR0cHM6Ly9hbmNob3IuZm0vcy85NTVlY2VjNC9wb2RjYXN0L3Jzcw
-
-Spotify - https://open.spotify.com/show/7IfJEeqO8ZF1qCPKkW5DPE  
-"""
-    if youtube_url is not None:
-        info = download_youtube_video(youtube_url, config.SOTA_DIR)
-    else:
-        info = {"file_name": file}
-        if title is None:
-            title = file.split("/")[-1].split(".")[0] + " - Rabbi Shloime Greenwald"
-        info["title"] = title
-        info["upload_date"] = datetime.now().strftime("%Y%m%d")
-
-    if youtube_url is None:
-        info["description"] = description
-
-    #info["file_name"] = enhance_podcast(info["file_name"], config)
-    info["thumbnail"] = picture
-    upload_to_spotify_podcasters(info, config)
-    if youtube_url is None:
-        file = create_video_from_audio_and_picture(info["file_name"], picture, config.SOTA_DIR + title + ".mp4")
-        print("Uploading to YouTube")
-        upload_video_with_options(file, title, description=description, privacyStatus="public")
-
-        youtube_url = input("What is the youtube link? ")
-        print("======\n\n")
-
-    #links = get_episode_links(title, config)
-    #daf = "ח"
-    youtube_id = youtube_url[-11:]
-    col = prepare_collive_embed(title, youtube_id)
-    #col = prepare_collive_post(links, daf, youtube_id)
-    #post = prepare_sharable_post(links, daf, youtube_id)
-
-   # with open(config.SOTA_DIR + "collection.csv", "a") as f:
-   #     f.write(f"{title},{info['upload_date']},{youtube_url},{spotify_link}\n")
-    return title, col
+    # with open(config.SOTA_DIR + "collection.csv", "a") as f:
+    #     f.write(f"{title},{info['upload_date']},{youtube_url},{spotify_link}\n")
+    #return title, col
+    return episode
 
 
 def likutei_torah_shiur(url: str):
@@ -81,7 +61,7 @@ def likutei_torah_shiur(url: str):
     info["url"] = None
     info["thumbnail"] = "shloimy.jpg"
 
-    upload_to_spotify_podcasters(info, config)
+    # upload_to_spotify_podcasters(info, config)
     time.sleep(120)
     spotify_link = get_latest_spotify_episode_link(info["title"], config.KOLEL_SPOTIFY_ID, config)
 
@@ -94,6 +74,14 @@ Spotify - {spotify}
         title=info["title"], youtube=info["url"], spotify=spotify_link
     )
     print(post_message)
+
+
+desc = """
+Topics include:
+- Proper time for one to use the restroom 
+- Being modest in a restroom 
+- Some more important conduct in a lavatory
+"""
 
 
 def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", picture: str = "halacha.jpg"):
@@ -120,19 +108,22 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
         "url": None,
         "thumbnail": picture,
     }
-    upload_to_spotify_podcasters(podcast_info, config)
+    local_media = LocalMedia(file_name=file, title=title, description=description, thumbnail=picture)
+    episode = publish_podcast(local_media, config.halacha, config)
+
+    # upload_to_spotify_podcasters(podcast_info, config)
 
     file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
-    upload_video_with_options(file, title, description=description, privacyStatus="public")
+    youtube_url = upload_video_with_options(file, title, description=description, privacyStatus="public")
 
     print(description)
-    youtube_link = input("What is the youtube link? ")
-    print("======\n\n")
-    spotify_link = get_latest_spotify_episode_link(title, config.KOLEL_SPOTIFY_ID, config)
+    # print("======\n\n")
+    # spotify_link = get_latest_spotify_episode_link(title, config.KOLEL_SPOTIFY_ID, config)
+    # spotify_link = ""
 
-    post_message = description + f"\nYouTube - {youtube_link}\nSpotify - {spotify_link}"
-    print(post_message)
+    # post_message = description + f"\nYouTube - {youtube_link}\nSpotify - {spotify_link}"
+    # print(post_message)
 
 
 def download2_and_enhance(url1: str, url2: str) -> str:
@@ -140,9 +131,11 @@ def download2_and_enhance(url1: str, url2: str) -> str:
     file1 = info1["file_name"]
     info2 = download_youtube_video(url1, config.DATA_DIR)
     file2 = info2["file_name"]
-    combined = combine_webm_files(file1, file2)
-    enhanced_file = enhance_podcast(combined, config)
-    return enhanced_file
+    combined = combine_mp3_files(file1, file2)
+    # combined = combine_webm_files(file1, file2)
+    # enhanced_file = enhance_podcast(combined, config)
+    # return enhanced_file
+    return combined
 
 
 def download_combine_and_enhance(url: str, file: str) -> str:
@@ -189,7 +182,7 @@ def add_youtube_to_podcast(file_path_1, url, episode_id):
 
 
 def add_audio_to_podcast(file_path_1, file_path_2, episode_id):
-    #file_path_2 = enhance_podcast(file_path_2, config)
+    # file_path_2 = enhance_podcast(file_path_2, config)
     combined = combine_mp3_files(file_path_1, file_path_2)
     media_id = upload_media(config=config, show_id=config.SHOWS_ID, file_name=combined)
     print(media_id)
@@ -215,48 +208,50 @@ def add_audio_to_podcast(file_path_1, file_path_2, episode_id):
     upload_video_with_options(file, title_2, description=episode["shownotes"], privacyStatus="public")
 
 
-def pls_create_video_and_podcast(file: str, title: str, picture: str = "shloimy.jpg"):
-    enhanced_file = enhance_podcast(file, config)
+def pls_create_video_and_podcast(file: str, title: str, desc: str = "", picture: str = "shloimy.jpg"):
+    # enhanced_file = enhance_podcast(file, config)
+    enhanced_file = file
 
     today = datetime.today()
     date_str = today.strftime("%Y%m%d")
     info = {
         "title": title,
-        "description": title,
+        "description": title + "\n" + desc,
         "file_name": enhanced_file,
         "upload_date": date_str,
         "url": "",
     }
     audio_to_captivateFM(info)
-    file = create_video_from_audio_and_picture(file, picture, "data/" + title + ".mp4")
+    file = create_video_from_audio_and_picture(file, picture, "data/PLS" + title + ".mp4")
+    youtube_url = upload_video_with_options(file, title, description=info["description"], privacyStatus="public")
     spotify_link = get_latest_spotify_episode_link(info["title"], config.PLS_SPOTIFY_ID, config)
-    upload_video_with_options(file, title, description=info["description"], privacyStatus="public")
+    print(
+        f"""
+{title}\n
+YouTube - {youtube_url}
+Spotify - {spotify_link}
+"""
+    )
 
 
 def youtube_to_captivateFM(url: str):
     info = download_youtube_video(url, config.DATA_DIR)
-    #info["file_name"] = enhance_podcast(info["file_name"], config)
+    # info["file_name"] = enhance_podcast(info["file_name"], config)
     audio_to_captivateFM(info)
 
 
-def audio_to_captivateFM(info):
+def audio_to_captivateFM(info: dict, show):
     formatted_upload_date = format_date(info["upload_date"])
-    media_id = upload_media(config=config, show_id=config.SHOWS_ID, file_name=info["file_name"])
+    show_id = show["show_id"]
+    media_id = upload_media(config=config, show_id=show_id, file_name=info["file_name"])
     episode_url = create_podcast(
         config=config,
         media_id=media_id,
         date=formatted_upload_date,
         title=info["title"],
         shownotes=info["description"] + "\n" + info["url"],
-        shows_id=config.SHOWS_ID,
+        shows_id=show_id,
     )
-    spotify_link = get_latest_spotify_episode_link(info["title"], config.PLS_SPOTIFY_ID, config)
-    print(episode_url)
-    print(spotify_link)
-    print("\n\n")
-    print(info["title"])
-    print("YouTube - " + info["url"])
-    print("Spotify - " + spotify_link)
 
 
 # if __name__ == "__main__":

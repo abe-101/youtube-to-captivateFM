@@ -5,22 +5,39 @@ from typing import Union
 
 from datetime import datetime
 
+
 class LocalMedia:
-    def __init__(self, file_name: str, title: str, description: str, thumbnail: str, upload_date: datetime):
-        self.file_name = file_name
-        self.title = title
-        self.description = description
-        self.url = None
-        self.thumbnail = thumbnail
-        self.upload_date = upload_date
-    
-    def __init__(self, file_name: str, title: str, url: str, description: str):
+    def __init__(
+        self,
+        file_name: str,
+        title: str,
+        description: str,
+        thumbnail: str = None,
+        url: str = "",
+        upload_date: datetime = datetime.now(),
+    ):
         self.file_name = file_name
         self.title = title
         self.description = description
         self.url = url
-        self.thumbnail = None
-        self.upload_date = datetime.now()
+        self.thumbnail = thumbnail
+        self.upload_date = upload_date
+
+    # def __init__(self, file_name: str, title: str, url: str, description: str):
+    #    self.file_name = file_name
+    #    self.title = title
+    #    self.description = description
+    #    self.url = url
+    #    self.thumbnail = None
+    #    self.upload_date = datetime.now()
+
+    # def __init__(self, file_name: str, title: str, str, description: str, thumbnail: str):
+    #    self.file_name = file_name
+    #    self.title = title
+    #    self.description = description
+    #    self.url = None
+    #    self.thumbnail = thumbnail
+    #    self.upload_date = datetime.now()
 
     def __str__(self):
         return f"Media: {self.title} ({self.file_name})\nDescription: {self.description}\nURL: {self.url}\nThumbnail: {self.thumbnail}\nUpload date: {self.upload_date}"
@@ -32,36 +49,32 @@ class LocalMedia:
             print("Error: Invalid date format. Use YYYYMMDD.")
 
 
-
-
-
 class ConfigurationManager:
     def __init__(self):
         self.CAPTIVATE_USER_ID = os.getenv("CAPTIVATE_USER_ID")
         self.CAPTIVATE_API_KEY = os.getenv("CAPTIVATE_API_KEY")
 
         self.pls = {
-            'show_id': os.getenv("PLS_SHOW_ID"),
-            'spotify_id': os.getenv("PLS_SPOTIFY_ID"),
-            'dir': os.getenv("PLS_DIR"),
-            'apple_url': os.getenv("PLS_APPLE_URL"),
-            'rss': os.getenv("PLS_RSS"),
+            "show_id": os.getenv("PLS_SHOW_ID"),
+            "spotify_id": os.getenv("PLS_SPOTIFY_ID"),
+            "dir": os.getenv("PLS_DIR"),
+            "apple_url": os.getenv("PLS_APPLE_URL"),
+            "rss": os.getenv("PLS_RSS"),
         }
         self.sota = {
-            'show_id': os.getenv("SOTA_SHOW_ID"),
-            'spotify_id': os.getenv("SOTA_SPOTIFY_ID"),
-            'dir': os.getenv("SOTA_DIR"),
-            'apple_url': os.getenv("SOTA_APPLE_URL"),
-            'rss': os.getenv("SOTA_RSS"),
+            "show_id": os.getenv("SOTA_SHOW_ID"),
+            "spotify_id": os.getenv("SOTA_SPOTIFY_ID"),
+            "dir": os.getenv("SOTA_DIR"),
+            "apple_url": os.getenv("SOTA_APPLE_URL"),
+            "rss": os.getenv("SOTA_RSS"),
         }
         self.halacha = {
-            'show_id': os.getenv("HALACHA_SHOW_ID"),
-            'spotify_id': os.getenv("HALACHA_SPOTIFY_ID"),
-            'dir': os.getenv("HALACHA_DIR"),
-            'apple_url': os.getenv("HALACHA_APPLE_URL"),
-            'rss': os.getenv("HALACHA_RSS"),
+            "show_id": os.getenv("HALACHA_SHOW_ID"),
+            "spotify_id": os.getenv("HALACHA_SPOTIFY_ID"),
+            "dir": os.getenv("HALACHA_DIR"),
+            "apple_url": os.getenv("HALACHA_APPLE_URL"),
+            "rss": os.getenv("HALACHA_RSS"),
         }
-
 
         self.DATA_DIR = os.getenv("DATA_DIR")
         self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False

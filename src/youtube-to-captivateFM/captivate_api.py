@@ -4,10 +4,10 @@ from typing import Union
 
 import requests
 
-from configuration_manager import ConfigurationManager
+from configuration_manager import ConfigurationManager, LocalMedia
 
 
-def format_date(date_str: str) -> Union[str, None]:
+def format_date(date: datetime) -> Union[str, None]:
     """
     This function takes in a date string in the format "YYYYMMDD" and returns it in the format "YYYY-MM-DD 12:00:00"
 
@@ -18,10 +18,7 @@ def format_date(date_str: str) -> Union[str, None]:
     :rtype: Union[str, None]
     """
     try:
-        time_str = time(6, 30, 0)
-        date_obj = datetime.strptime(date_str, "%Y%m%d").date()
-        dt_obj = datetime.combine(date_obj, time_str)
-        formatted_date = dt_obj.strftime("%Y-%m-%d %H:%M:%S")
+        formatted_date = date.strftime("%Y-%m-%d %H:%M:%S")
         return formatted_date
 
     except ValueError as e:
@@ -203,7 +200,7 @@ def update_podcast(
         return None
 
 
-def publish_podcast(info: Dict[str, str], show: Dict[str, str]) -> str:
+def publish_podcast(local_medie: LocalMedia, show: Dict[str, str], config: ConfigurationManager, episode_num: str = "1") -> str:
     """
     Publishes an audio file as a new podcast episode on CaptivateFM.
 
@@ -219,16 +216,16 @@ def publish_podcast(info: Dict[str, str], show: Dict[str, str]) -> str:
     Raises:
         ValueError: If any required keys are missing from the info or show dictionaries.
     """
-    formatted_upload_date = format_date(info["upload_date"])
+    formatted_upload_date = format_date(local_medie.upload_date)
     show_id = show["show_id"]
-    media_id = upload_media(config=config, show_id=show_id, file_name=info["file_name"])
+    media_id = upload_media(config=config, show_id=show_id, file_name=local_medie.file_name)
     episode_id = create_podcast(
         config=config,
         media_id=media_id,
         date=formatted_upload_date,
-        title=info["title"],
-        shownotes=info["description"] + "\n" + info["url"],
+        title=local_medie.title,
+        shownotes=local_medie.description + "\n" + local_medie.url,
         shows_id=show_id,
+        episode_number=episode_num,
     )
     return episode_id
-

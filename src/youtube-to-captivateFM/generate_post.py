@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 
-#from rich import print
+# from rich import print
 from rich.prompt import Prompt
 from rich.console import Console
 from rich.table import Table
@@ -27,21 +27,23 @@ config = ConfigurationManager()
 YOUTUBE_TO_ANCHORFM = os.getenv("YOUTUBE_TO_ANCHORFM_DIR")
 api_key = config.YOUTUBE_API
 
+
 def get_links(video):
     show_names = [d for d in vars(config) if isinstance(vars(config)[d], dict)]
     print("Choose a Podcast show: ")
     for i, show in enumerate(show_names):
-        print(f'{i}: {show}')
+        print(f"{i}: {show}")
 
     show_num = int(input())
     shows = [vars(config)[d] for d in vars(config) if isinstance(vars(config)[d], dict)]
 
     links = get_episode_links(video.name, shows[show_num], config)
-    #embed = prepare_collive_embed(links)
+    # embed = prepare_collive_embed(links)
     post = prepare_sharable_post(links, video.id, video.name)
 
-    #print(embed)
+    # print(embed)
     print(post)
+
 
 def publish_video(youtube_id: str):
     print(f"Attempting {youtube_id}")
@@ -52,7 +54,6 @@ def publish_video(youtube_id: str):
     subprocess.run(["npm start"], shell=True)
 
     print(f"Finished {youtube_id}")
-
 
 
 # Specify the channel ID
@@ -72,7 +73,7 @@ request = youtube.search().list(
     type="video",
     order="date",
     maxResults=max_results,
-    #pageToken="CDIQAA"
+    # pageToken="CDIQAA"
 )
 
 try:
@@ -88,17 +89,10 @@ db = list()
 for video in response["items"]:
     publish_time = video["snippet"]["publishedAt"]
     # convert date to datetime object
-    publish_time_dt = datetime.strptime(
-        publish_time, "%Y-%m-%dT%H:%M:%SZ")
+    publish_time_dt = datetime.strptime(publish_time, "%Y-%m-%dT%H:%M:%SZ")
     # convert from utc to est
-    est_time = publish_time_dt.replace(
-        tzinfo=timezone.utc).astimezone(
-        ZoneInfo("America/New_York"))
-    db.append(
-        Video(
-            id=video["id"]["videoId"],
-            name=video["snippet"]["title"],
-            date=est_time))
+    est_time = publish_time_dt.replace(tzinfo=timezone.utc).astimezone(ZoneInfo("America/New_York"))
+    db.append(Video(id=video["id"]["videoId"], name=video["snippet"]["title"], date=est_time))
 table = Table(title="Please choose from the following videos:")
 table.add_column("#", style="cyan", no_wrap=True)
 table.add_column("video ID", style="magenta")
@@ -107,13 +101,15 @@ table.add_column("Name", style="cyan", no_wrap=True)
 
 for i, v in enumerate(db):
     table.add_row(str(i + 1), v.id, str(v.date), v.name)
-    #print(i + 1, " | ", v.id, " | ", v.date, " | ", v.name)
+    # print(i + 1, " | ", v.id, " | ", v.date, " | ", v.name)
 
 console = Console()
 console.print(table)
 
 
-choices = Prompt.ask("Enter your choices separated by a comma: ", default="0", choices=[str(i) for i in range(len(db)+1)])
+choices = Prompt.ask(
+    "Enter your choices separated by a comma: ", default="0", choices=[str(i) for i in range(len(db) + 1)]
+)
 
 choices = choices.split(",")
 

@@ -19,7 +19,7 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
         {
             "format": "bestaudio/best",
             "outtmpl": f"{folder_path}/%(title)s.%(ext)s",
-            'keepvideo': True,
+            "keepvideo": True,
             "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}],
         }
     ) as ydl:
@@ -33,10 +33,10 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
     )
     local_media.set_upload_date_from_string(video_info.get("upload_date"))
     return local_media
-    #return {
+    # return {
     #    "title": video_info["title"],
     #    "description": video_info.get("description"),
     #    "file_name": video_info["requested_downloads"][0]["filepath"],
     #    "upload_date": video_info.get("upload_date"),
     #    "url": url,
-    #}
+    # }

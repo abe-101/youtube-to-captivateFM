@@ -78,6 +78,8 @@ def resumable_upload(request):
             if response is not None:
                 if "id" in response:
                     print('Video ID "%s" was successfully uploaded.' % response["id"])
+                    video_url = "https://www.youtube.com/watch?v=%s" % response["id"]
+                    print(video_url)
                 else:
                     exit("The upload failed with an unexpected response: %s" % response)
         except HttpError as e:
@@ -95,6 +97,7 @@ def resumable_upload(request):
             max_sleep = 2**retry
             sleep_seconds = random.random() * max_sleep
             print("sleeping %f seconds and then retrying..." % sleep_seconds)
+    return video_url
 
 
 # this function creates the request and initializes the upload
@@ -115,7 +118,8 @@ def initialize_upload(youtube, options):
     insert_request = youtube.videos().insert(
         part=",".join(body.keys()), body=body, media_body=MediaFileUpload(options.file, chunksize=-1, resumable=True)
     )
-    resumable_upload(insert_request)
+    video_url = resumable_upload(insert_request)
+    return video_url
 
 
 def upload_video_with_options(
@@ -133,7 +137,8 @@ def upload_video_with_options(
     os.environ["OUATHLIB_INSECURE_TRANSPORT"] = "1"
     # Call the upload_video method with the options
     youtubedata = get_service()
-    initialize_upload(youtubedata, options)
+    video_url = initialize_upload(youtubedata, options)
+    return video_url
 
 
 # function when run directly

@@ -4,8 +4,7 @@ from typing import Optional
 from pydub import AudioSegment
 
 
-def create_video_from_audio_and_picture(
-        audio_file: str, image_file: str, video_file: str) -> str:
+def create_video_from_audio_and_picture(audio_file: str, image_file: str, video_file: str) -> str:
     """
     Creates a video from an audio file and an image file, and saves the video as a new file.
 
@@ -48,8 +47,7 @@ def create_video_from_audio_and_picture(
     return video_file
 
 
-def convert_wav_to_mp3(input_file: str,
-                       output_file: Optional[str] = None) -> str:
+def convert_wav_to_mp3(input_file: str, output_file: Optional[str] = None) -> str:
     """Convert WAV audio file to MP3.
 
     :param input_file: The file path of the WAV audio file to be converted.
@@ -86,8 +84,7 @@ def combine_mp3_files(file1: str, file2: str) -> str:
     return new
 
 
-def combine_webm_files(input_file1: str, input_file2: str,
-                       output_file: str = None) -> None:
+def combine_webm_files(input_file1: str, input_file2: str, output_file: str = None) -> None:
     """
     Combine two WebM audio files into a single file.
 

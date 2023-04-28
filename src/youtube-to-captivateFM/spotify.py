@@ -38,8 +38,8 @@ def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, 
             print(f'{i+1}. {response["items"][i]["name"]}')
         n = int(input("Choose episode 1-5 (0 to try again in 2): "))
         if n != 0:
-            episode_link = response["items"][n-1]["external_urls"]["spotify"]
-            episode_name = response["items"][n-1]["name"]
+            episode_link = response["items"][n - 1]["external_urls"]["spotify"]
+            episode_name = response["items"][n - 1]["name"]
             print(f"Found Spotify link for {episode_name}\n{episode_link}")
             return episode_link
 
