@@ -24,63 +24,40 @@ from podcast_links import get_episode_links, prepare_collive_post, prepare_shara
 load_dotenv()
 
 config = ConfigurationManager()
+def all_kolel():
+    with open("needs_podcasts.csv") as f:
+        for line in f:
+            kolel(line[:11])
 
+def kolel(url: str):
+    local_media: LocalMedia = download_youtube_video(url, config.kolel["dir"])
+    print(local_media)
+    episode = publish_podcast(local_media, config.kolel, config)
+    return episode
 
 def meseches_sota_shiur(youtube_url: str, num_daf: int):
     local_media: LocalMedia = download_youtube_video(youtube_url, config.sota["dir"])
 
     local_media.thumbnail = config.sota["dir"] + "square-lower/0"+str(num_daf)+".jpg"
+    print(local_media)
+    print(local_media.thumbnail)
     
     episode = publish_podcast(local_media, config.sota, config, episode_num=str(num_daf))
-    #upload_to_spotify_podcasters(info, config)
-    #if youtube_url is None:
-    #    file = create_video_from_audio_and_picture(info["file_name"], picture, config.SOTA_DIR + title + ".mp4")
-    #    print("Uploading to YouTube")
-    #    upload_video_with_options(file, title, description=description, privacyStatus="public")
-
-    #    youtube_url = input("What is the youtube link? ")
-    #    print("======\n\n")
-
-    # links = get_episode_links(title, config)
-    # daf = "ח"
-    #youtube_id = youtube_url[-11:]
-    #col = prepare_collive_embed(title, youtube_id)
-    # col = prepare_collive_post(links, daf, youtube_id)
-    # post = prepare_sharable_post(links, daf, youtube_id)
-
-    # with open(config.SOTA_DIR + "collection.csv", "a") as f:
-    #     f.write(f"{title},{info['upload_date']},{youtube_url},{spotify_link}\n")
-    #return title, col
     return episode
 
 
 def likutei_torah_shiur(url: str):
-    info = download_youtube_video(url, config.DATA_DIR)
-    info["file_name"] = enhance_podcast(info["file_name"], config)
-    info["upload_date"] = None
-    info["url"] = None
-    info["thumbnail"] = "shloimy.jpg"
-
-    # upload_to_spotify_podcasters(info, config)
-    time.sleep(120)
-    spotify_link = get_latest_spotify_episode_link(info["title"], config.KOLEL_SPOTIFY_ID, config)
-
-    post_message = """
-{title}
-
-YouTube - {youtube}
-Spotify - {spotify}
-""".format(
-        title=info["title"], youtube=info["url"], spotify=spotify_link
-    )
-    print(post_message)
-
+    local_media: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
+    local_media.thumbnail = "data/sg-chassidus/sg-chassidus.jpg"
+    episode = publish_podcast(local_media, config.sg_chassidus, config)
+    print(episode)
 
 desc = """
-Topics include:
-- Proper time for one to use the restroom 
-- Being modest in a restroom 
-- Some more important conduct in a lavatory
+Topics include 
+
+- Forbidden to think words of Torah in bathroom 
+- Forbidden when cleaning oneself 
+- If one goes several times to the restroom, when should he make the Bracha אשר יצר
 """
 
 

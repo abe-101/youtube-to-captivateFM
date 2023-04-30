@@ -20,16 +20,21 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
             "format": "bestaudio/best",
             "outtmpl": f"{folder_path}/%(title)s.%(ext)s",
             "keepvideo": True,
+            "live_from_start": True,
+            #"concurrent_fragment_downloads": 4,
             "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}],
         }
     ) as ydl:
         video_info = ydl.extract_info(url)
+    if len(url) == 11:
+        url = f"https://www.youtube.com/watch?v={url}"
 
     local_media = LocalMedia(
         file_name=video_info["requested_downloads"][0]["filepath"],
         title=video_info["title"],
         description=video_info.get("description"),
         url=url,
+        thumbnail=video_info.get("thumbnail"),
     )
     local_media.set_upload_date_from_string(video_info.get("upload_date"))
     return local_media

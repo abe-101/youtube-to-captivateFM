@@ -23,22 +23,6 @@ class LocalMedia:
         self.thumbnail = thumbnail
         self.upload_date = upload_date
 
-    # def __init__(self, file_name: str, title: str, url: str, description: str):
-    #    self.file_name = file_name
-    #    self.title = title
-    #    self.description = description
-    #    self.url = url
-    #    self.thumbnail = None
-    #    self.upload_date = datetime.now()
-
-    # def __init__(self, file_name: str, title: str, str, description: str, thumbnail: str):
-    #    self.file_name = file_name
-    #    self.title = title
-    #    self.description = description
-    #    self.url = None
-    #    self.thumbnail = thumbnail
-    #    self.upload_date = datetime.now()
-
     def __str__(self):
         return f"Media: {self.title} ({self.file_name})\nDescription: {self.description}\nURL: {self.url}\nThumbnail: {self.thumbnail}\nUpload date: {self.upload_date}"
 
@@ -74,6 +58,20 @@ class ConfigurationManager:
             "dir": os.getenv("HALACHA_DIR"),
             "apple_url": os.getenv("HALACHA_APPLE_URL"),
             "rss": os.getenv("HALACHA_RSS"),
+        }
+        self.kolel = {
+            "show_id": os.getenv("KOLEL_SHOW_ID"),
+            "spotify_id": os.getenv("KOLEL_SPOTIFY_ID"),
+            "dir": os.getenv("KOLEL_DIR"),
+            "apple_url": os.getenv("KOLEL_APPLE_URL"),
+            "rss": os.getenv("KOLEL_RSS"),
+        }
+        self.sg_chassidus = {
+            "show_id": os.getenv("SG_CHASSIDUS_SHOW_ID"),
+            "spotify_id": os.getenv("SG_CHASSIDUS_SPOTIFY_ID"),
+            "dir": os.getenv("SG_CHASSIDUS_DIR"),
+            "apple_url": os.getenv("SG_CHASSIDUS_APPLE_URL"),
+            "rss": os.getenv("SG_CHASSIDUS_RSS"),
         }
 
         self.DATA_DIR = os.getenv("DATA_DIR")

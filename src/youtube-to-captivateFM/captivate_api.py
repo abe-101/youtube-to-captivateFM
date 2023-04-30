@@ -73,6 +73,7 @@ def create_podcast(
     date: str,
     shownotes: str,
     shows_id: str,
+    episode_art: str = None,
     status: str = "draft",
     episode_season: str = "1",
     episode_number: str = "1",
@@ -112,6 +113,7 @@ def create_podcast(
         "shownotes": shownotes,
         "episode_season": episode_season,
         "episode_number": episode_number,
+        "episode_art": episode_art,
     }
 
     files = []
@@ -200,7 +202,7 @@ def update_podcast(
         return None
 
 
-def publish_podcast(local_medie: LocalMedia, show: Dict[str, str], config: ConfigurationManager, episode_num: str = "1") -> str:
+def publish_podcast(local_media: LocalMedia, show: Dict[str, str], config: ConfigurationManager, episode_num: str = "1") -> str:
     """
     Publishes an audio file as a new podcast episode on CaptivateFM.
 
@@ -216,16 +218,17 @@ def publish_podcast(local_medie: LocalMedia, show: Dict[str, str], config: Confi
     Raises:
         ValueError: If any required keys are missing from the info or show dictionaries.
     """
-    formatted_upload_date = format_date(local_medie.upload_date)
+    formatted_upload_date = format_date(local_media.upload_date)
     show_id = show["show_id"]
-    media_id = upload_media(config=config, show_id=show_id, file_name=local_medie.file_name)
+    media_id = upload_media(config=config, show_id=show_id, file_name=local_media.file_name)
     episode_id = create_podcast(
         config=config,
         media_id=media_id,
         date=formatted_upload_date,
-        title=local_medie.title,
-        shownotes=local_medie.description + "\n" + local_medie.url,
+        title=local_media.title,
+        shownotes=local_media.description + "\n" + local_media.url,
         shows_id=show_id,
         episode_number=episode_num,
+        episode_art=local_media.thumbnail,
     )
     return episode_id
