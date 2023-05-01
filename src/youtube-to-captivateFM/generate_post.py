@@ -43,6 +43,7 @@ def get_links(video):
 
     # print(embed)
     print(post)
+    print("Short on time? Listen to a recap: ")
 
 
 def publish_video(youtube_id: str):
