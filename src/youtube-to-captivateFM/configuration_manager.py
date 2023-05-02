@@ -1,9 +1,9 @@
-import os
 import base64
-import requests
+import os
+from datetime import datetime
 from typing import Union
 
-from datetime import datetime
+import requests
 
 
 class LocalMedia:

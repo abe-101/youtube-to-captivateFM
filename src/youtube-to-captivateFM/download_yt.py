@@ -1,7 +1,8 @@
 from typing import Dict
-from configuration_manager import LocalMedia
 
 from yt_dlp import YoutubeDL
+
+from configuration_manager import LocalMedia
 
 
 def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
@@ -21,7 +22,7 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
             "outtmpl": f"{folder_path}/%(title)s.%(ext)s",
             "keepvideo": True,
             "live_from_start": True,
-            #"concurrent_fragment_downloads": 4,
+            # "concurrent_fragment_downloads": 4,
             "postprocessors": [{"key": "FFmpegExtractAudio", "preferredcodec": "mp3"}],
         }
     ) as ydl:

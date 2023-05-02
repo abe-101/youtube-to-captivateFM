@@ -1,6 +1,5 @@
-from typing import Dict
 from datetime import datetime, time
-from typing import Union
+from typing import Dict, Union
 
 import requests
 
@@ -202,7 +201,9 @@ def update_podcast(
         return None
 
 
-def publish_podcast(local_media: LocalMedia, show: Dict[str, str], config: ConfigurationManager, episode_num: str = "1") -> str:
+def publish_podcast(
+    local_media: LocalMedia, show: Dict[str, str], config: ConfigurationManager, episode_num: str = "1"
+) -> str:
     """
     Publishes an audio file as a new podcast episode on CaptivateFM.
 

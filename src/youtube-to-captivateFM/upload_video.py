@@ -9,6 +9,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
+
 from configuration_manager import ConfigurationManager, LocalMedia
 
 Options = namedtuple("Options", ["file", "title", "description", "category", "keywords", "privacyStatus"])
@@ -124,7 +125,7 @@ def initialize_upload(youtube, options):
 
 
 def upload_video_with_options(
-        localMedia: LocalMedia, category: str = "22", keywords: str = "", privacyStatus: str = "private"
+    localMedia: LocalMedia, category: str = "22", keywords: str = "", privacyStatus: str = "private"
 ):
     options = Options(
         file=localMedia.file_path,

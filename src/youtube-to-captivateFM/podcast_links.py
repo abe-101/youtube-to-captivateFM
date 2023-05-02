@@ -1,8 +1,9 @@
 import feedparser
 import requests
-from spotify import get_latest_spotify_episode_link
-from configuration_manager import ConfigurationManager
 from bs4 import BeautifulSoup
+
+from configuration_manager import ConfigurationManager
+from spotify import get_latest_spotify_episode_link
 
 # Define the URL of the Apple Podcasts page for your podcast episode
 APPLE_URL = "https://podcasts.apple.com/us/podcast/kolel-lhoraah-maasis/id1670169956"

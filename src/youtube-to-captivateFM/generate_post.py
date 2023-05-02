@@ -3,22 +3,21 @@
 import os
 import subprocess
 import sys
+from collections import namedtuple
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+from dotenv import load_dotenv
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from rich.console import Console
 
 # from rich import print
 from rich.prompt import Prompt
-from rich.console import Console
 from rich.table import Table
-from dotenv import load_dotenv
-from collections import namedtuple
 
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
-
-from podcast_links import get_episode_links, prepare_collive_embed, prepare_sharable_post
 from configuration_manager import ConfigurationManager
+from podcast_links import get_episode_links, prepare_collive_embed, prepare_sharable_post
 
 load_dotenv()
 
