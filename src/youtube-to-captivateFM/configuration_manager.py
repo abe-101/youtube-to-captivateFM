@@ -74,7 +74,7 @@ class ConfigurationManager:
             "rss": os.getenv("SG_CHASSIDUS_RSS"),
         }
 
-        self.DATA_DIR = os.getenv("DATA_DIR")
+        self.PROJECT_DIR = os.getenv("PROJECT_DIR")
         self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False
 
         self.CLIENT_ID = os.getenv("CLIENT_ID")

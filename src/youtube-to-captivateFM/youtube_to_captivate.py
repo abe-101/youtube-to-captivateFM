@@ -46,20 +46,33 @@ def meseches_sota_shiur(youtube_url: str, num_daf: int):
     return episode
 
 
-def likutei_torah_shiur(url: str):
+def chassidus_podcast(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
     local_media.thumbnail = "data/sg-chassidus/sg-chassidus.jpg"
     episode = publish_podcast(local_media, config.sg_chassidus, config)
     print(episode)
 
-desc = """
-Topics include 
+def add_youtube_to_chassidus_podcast(file_path_1, url, episode_id):
+    file_2: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
+    combined = combine_mp3_files(file_path_1, file_2.file_name)
+    show_id = config.sg_chassidus["show_id"]
+    media_id = upload_media(config=config, show_id=show_id, file_name=combined)
+    print(media_id)
+    episode = get_episode(config, episode_id)
+    episode_url = update_podcast(
+        config=config,
+        media_id=media_id,
+        shows_id=show_id,
+        episode_id=episode_id,
+        shownotes=episode["shownotes"],
+        title=episode["title"],
+        date=episode["published_date"],
+        status=episode["status"],
+        episode_season=episode["episode_season"],
+        episode_number=episode["episode_number"],
+    )
 
-- Forbidden to think words of Torah in bathroom 
-- Forbidden when cleaning oneself 
-- If one goes several times to the restroom, when should he make the Bracha אשר יצר
-"""
-
+    print(episode_url)
 
 def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", picture: str = "halacha.jpg"):
     if title is None:
@@ -87,8 +100,6 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
     }
     local_media = LocalMedia(file_name=file, title=title, description=description, thumbnail=picture)
     episode = publish_podcast(local_media, config.halacha, config)
-
-    # upload_to_spotify_podcasters(podcast_info, config)
 
     file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
