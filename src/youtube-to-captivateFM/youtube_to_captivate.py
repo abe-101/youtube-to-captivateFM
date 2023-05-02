@@ -7,7 +7,6 @@ import time
 from dotenv import load_dotenv
 
 from adobe_podcast import enhance_podcast
-from spotify_podcasters import upload_to_spotify_podcasters
 from audio_conversion import (
     combine_mp3_files,
     combine_webm_files,
@@ -24,10 +23,13 @@ from podcast_links import get_episode_links, prepare_collive_post, prepare_shara
 load_dotenv()
 
 config = ConfigurationManager()
+
+
 def all_kolel():
     with open("needs_podcasts.csv") as f:
         for line in f:
             kolel(line[:11])
+
 
 def kolel(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.kolel["dir"])
@@ -35,22 +37,24 @@ def kolel(url: str):
     episode = publish_podcast(local_media, config.kolel, config)
     return episode
 
+
 def meseches_sota_shiur(youtube_url: str, num_daf: int):
     local_media: LocalMedia = download_youtube_video(youtube_url, config.sota["dir"])
 
-    local_media.thumbnail = config.sota["dir"] + "square-lower/0"+str(num_daf)+".jpg"
+    local_media.thumbnail = config.sota["dir"] + "square-lower/0" + str(num_daf) + ".jpg"
     print(local_media)
     print(local_media.thumbnail)
-    
+
     episode = publish_podcast(local_media, config.sota, config, episode_num=str(num_daf))
     return episode
 
 
 def chassidus_podcast(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
-    local_media.thumbnail = "data/sg-chassidus/sg-chassidus.jpg"
+    # local_media.thumbnail = "data/sg-chassidus/sg-chassidus.jpg"
     episode = publish_podcast(local_media, config.sg_chassidus, config)
     print(episode)
+
 
 def add_youtube_to_chassidus_podcast(file_path_1, url, episode_id):
     file_2: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
@@ -74,6 +78,7 @@ def add_youtube_to_chassidus_podcast(file_path_1, url, episode_id):
 
     print(episode_url)
 
+
 def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", picture: str = "halacha.jpg"):
     if title is None:
         title = file.split("/")[-1].split(".")[0]
@@ -90,73 +95,56 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
     print(description)
 
     file = enhance_podcast(file, config)
-    podcast_info = {
-        "title": title,
-        "description": description,
-        "file_name": file,
-        "upload_date": None,
-        "url": None,
-        "thumbnail": picture,
-    }
     local_media = LocalMedia(file_name=file, title=title, description=description, thumbnail=picture)
     episode = publish_podcast(local_media, config.halacha, config)
 
     file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
-    youtube_url = upload_video_with_options(file, title, description=description, privacyStatus="public")
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
 
     print(description)
-    # print("======\n\n")
-    # spotify_link = get_latest_spotify_episode_link(title, config.KOLEL_SPOTIFY_ID, config)
-    # spotify_link = ""
-
-    # post_message = description + f"\nYouTube - {youtube_link}\nSpotify - {spotify_link}"
-    # print(post_message)
 
 
-def download2_and_enhance(url1: str, url2: str) -> str:
+def download2_and_combine(url1: str, url2: str) -> str:
     info1 = download_youtube_video(url1, config.DATA_DIR)
     file1 = info1["file_name"]
     info2 = download_youtube_video(url1, config.DATA_DIR)
     file2 = info2["file_name"]
     combined = combine_mp3_files(file1, file2)
-    # combined = combine_webm_files(file1, file2)
-    # enhanced_file = enhance_podcast(combined, config)
-    # return enhanced_file
     return combined
 
 
 def download_combine_and_enhance(url: str, file: str) -> str:
-    info = download_youtube_video(url, config.DATA_DIR)
-    combined = combine_mp3_files(info["file_name"], file)
+    localMedia: LocalMedia = download_youtube_video(url, "data/")
+    combined = combine_mp3_files(file, localMedia["file_name"])
     enhanced_file = enhance_podcast(combined, config)
     return combined
 
 
 def download_enhance_and_combine(url: str, file: str) -> str:
-    info = download_youtube_video(url, config.DATA_DIR)
-    enhanced_file = enhance_podcast(info["file_name"], config)
+    localMedia: LocalMedia = download_youtube_video(url, config.DATA_DIR)
+    enhanced_file = enhance_podcast(localMedia["file_name"], config)
     combined = combine_mp3_files(file, enhanced_file)
     return combined
 
 
 def download_and_enhance(url: str) -> str:
-    info = download_youtube_video(url, config.DATA_DIR)
-    enhanced_file = enhance_podcast(info["file_name"], config)
+    localMedia: LocalMedia = download_youtube_video(url, config.DATA_DIR)
+    enhanced_file = enhance_podcast(localMedia["file_name"], config)
     return enhanced_file
 
 
-def add_youtube_to_podcast(file_path_1, url, episode_id):
-    info = download_youtube_video(url, config.DATA_DIR)
-    file_path_2 = enhance_podcast(info["file_name"], config)
-    combined = combine_mp3_files(file_path_1, file_path_2)
-    media_id = upload_media(config=config, show_id=config.SHOWS_ID, file_name=combined)
+def add_youtube_to_pls(file_path_1, url, episode_id):
+    local_media: LocalMedia = download_youtube_video(url, config.pls["dir"])
+    combined = combine_mp3_files(file_path_1, localMedia.file_name)
+    show_id = config.pls["show_id"]
+    media_id = upload_media(config=config, show_id=show_id, file_name=combined)
     print(media_id)
     episode = get_episode(config, episode_id)
     episode_url = update_podcast(
         config=config,
         media_id=media_id,
-        shows_id=config.SHOWS_ID,
+        shows_id=show_id,
         episode_id=episode_id,
         shownotes=episode["shownotes"],
         title=episode["title"],
@@ -169,16 +157,17 @@ def add_youtube_to_podcast(file_path_1, url, episode_id):
     print(episode_url)
 
 
-def add_audio_to_podcast(file_path_1, file_path_2, episode_id):
+def add_audio_to_pls(file_path_1, file_path_2, episode_id):
     # file_path_2 = enhance_podcast(file_path_2, config)
     combined = combine_mp3_files(file_path_1, file_path_2)
-    media_id = upload_media(config=config, show_id=config.SHOWS_ID, file_name=combined)
+    show_id = config.pls["show_id"]
+    media_id = upload_media(config=config, show_id=show_id, file_name=combined)
     print(media_id)
     episode = get_episode(config, episode_id)
     episode_url = update_podcast(
         config=config,
         media_id=media_id,
-        shows_id=config.SHOWS_ID,
+        shows_id=show_id,
         episode_id=episode_id,
         shownotes=episode["shownotes"],
         title=episode["title"],
@@ -191,56 +180,38 @@ def add_audio_to_podcast(file_path_1, file_path_2, episode_id):
     print(episode_url)
 
     title_2 = episode["title"] + " Part 2"
+    local_media = LocalMedia(
+        file_name=file_path_2, title=title_2, description=episode["shownotes"], thumbnail="shloimy.jpg"
+    )
 
     file = create_video_from_audio_and_picture(file_path_2, "shloimy.jpg", title_2 + ".mp4")
-    upload_video_with_options(file, title_2, description=episode["shownotes"], privacyStatus="public")
+    upload_video_with_options(local_media, privacyStatus="public")
 
 
 def pls_create_video_and_podcast(file: str, title: str, desc: str = "", picture: str = "shloimy.jpg"):
     # enhanced_file = enhance_podcast(file, config)
-    enhanced_file = file
 
-    today = datetime.today()
-    date_str = today.strftime("%Y%m%d")
-    info = {
-        "title": title,
-        "description": title + "\n" + desc,
-        "file_name": enhanced_file,
-        "upload_date": date_str,
-        "url": "",
-    }
-    audio_to_captivateFM(info)
+    local_media = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=picture)
+
+    audio_to_pls(local_media, config.pls)
     file = create_video_from_audio_and_picture(file, picture, "data/PLS" + title + ".mp4")
-    youtube_url = upload_video_with_options(file, title, description=info["description"], privacyStatus="public")
-    spotify_link = get_latest_spotify_episode_link(info["title"], config.PLS_SPOTIFY_ID, config)
-    print(
-        f"""
-{title}\n
-YouTube - {youtube_url}
-Spotify - {spotify_link}
-"""
-    )
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+    print(youtube_url)
 
 
-def youtube_to_captivateFM(url: str):
-    info = download_youtube_video(url, config.DATA_DIR)
-    # info["file_name"] = enhance_podcast(info["file_name"], config)
-    audio_to_captivateFM(info)
+def youtube_to_pls(url: str):
+    localMedia: LocalMedia = download_youtube_video(url, config.pls["dir"])
+    audio_to_pls(localMedia)
 
 
-def audio_to_captivateFM(info: dict, show):
-    formatted_upload_date = format_date(info["upload_date"])
+def audio_to_pls(localMedia: LocalMedia, show):
     show_id = show["show_id"]
-    media_id = upload_media(config=config, show_id=show_id, file_name=info["file_name"])
+    media_id = upload_media(config=config, show_id=show_id, file_name=localMedia["file_name"])
     episode_url = create_podcast(
         config=config,
         media_id=media_id,
         date=formatted_upload_date,
-        title=info["title"],
-        shownotes=info["description"] + "\n" + info["url"],
+        title=localMedia["title"],
+        shownotes=localMedia["description"] + "\n" + localMedia["url"],
         shows_id=show_id,
     )
-
-
-# if __name__ == "__main__":
-#    youtube_to_captivateFM(input("Enter url of youtube video: "))
