@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 
 from dotenv import load_dotenv
+from imgurpython import ImgurClient
 
 from adobe_podcast import enhance_podcast
 from audio_conversion import (
@@ -41,10 +42,13 @@ def kolel(url: str):
 def meseches_sota_shiur(youtube_url: str, num_daf: int):
     local_media: LocalMedia = download_youtube_video(youtube_url, config.sota["dir"])
 
-    local_media.thumbnail = config.sota["dir"] + "square-lower/0" + str(num_daf) + ".jpg"
-    print(local_media)
-    print(local_media.thumbnail)
-
+    print("getting thumbnail")
+    client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
+    pic = config.sota["dir"] + "square-lower/0" + str(num_daf) + ".jpg"
+    print(pic)
+    uploaded_image = client.upload_from_path(pic)
+    print(uploaded_image["link"])
+    local_media.thumbnail = uploaded_image["link"]
     episode = publish_podcast(local_media, config.sota, config, episode_num=str(num_daf))
     return episode
 
@@ -98,7 +102,7 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
     local_media = LocalMedia(file_name=file, title=title, description=description, thumbnail=picture)
     episode = publish_podcast(local_media, config.halacha, config)
 
-    file = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
+    local_media.file_name = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
     youtube_url = upload_video_with_options(local_media, privacyStatus="public")
 
@@ -136,7 +140,7 @@ def download_and_enhance(url: str) -> str:
 
 def add_youtube_to_pls(file_path_1, url, episode_id):
     local_media: LocalMedia = download_youtube_video(url, config.pls["dir"])
-    combined = combine_mp3_files(file_path_1, localMedia.file_name)
+    combined = combine_mp3_files(file_path_1, local_media.file_name)
     show_id = config.pls["show_id"]
     media_id = upload_media(config=config, show_id=show_id, file_name=combined)
     print(media_id)

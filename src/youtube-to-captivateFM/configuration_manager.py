@@ -25,12 +25,18 @@ class LocalMedia:
 
     def __str__(self):
         return f"Media: {self.title} ({self.file_name})\nDescription: {self.description}\nURL: {self.url}\nThumbnail: {self.thumbnail}\nUpload date: {self.upload_date}"
+    
+    def set_upload_date_from_timestamp(self, timestamp: int):
+        try:
+            self.upload_date = datetime.fromtimestamp(timestamp)
+        except ValueError:
+            print("Error: Invalid timestamp." + str(timestamp))
 
     def set_upload_date_from_string(self, date_str: str):
         try:
             self.upload_date = datetime.strptime(date_str, "%Y%m%d")
         except ValueError:
-            print("Error: Invalid date format. Use YYYYMMDD.")
+            print("Error: Invalid date format. Use YYYYMMDD." + date_str)
 
 
 class ConfigurationManager:
@@ -73,6 +79,9 @@ class ConfigurationManager:
             "apple_url": os.getenv("SG_CHASSIDUS_APPLE_URL"),
             "rss": os.getenv("SG_CHASSIDUS_RSS"),
         }
+
+        self.IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
+        self.IMGUR_CLIENT_SECRET = os.getenv("IMGUR_CLIENT_SECRET")
 
         self.PROJECT_DIR = os.getenv("PROJECT_DIR")
         self.PLAYWRITE_HEADLESS = True if os.getenv("PLAYWRIGHT_HEADLESS") == "True" else False
