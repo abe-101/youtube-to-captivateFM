@@ -128,7 +128,7 @@ def upload_video_with_options(
     localMedia: LocalMedia, category: str = "22", keywords: str = "", privacyStatus: str = "private"
 ):
     options = Options(
-        file=localMedia.file_path,
+        file=localMedia.file_name,
         title=localMedia.title,
         description=localMedia.description,
         category=category,
