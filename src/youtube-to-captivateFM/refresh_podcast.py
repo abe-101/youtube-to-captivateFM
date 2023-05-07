@@ -1,8 +1,29 @@
 import csv
 
 import feedparser
+from configuration_manager import ConfigurationManager
+from dotenv import load_dotenv
 
-url = "https://feeds.captivate.fm/kolel/"
+import yt_dlp
+
+load_dotenv()
+config = ConfigurationManager()
+playlist_id = config.KOLEL_YOUTUBE_CHANNEL_ID
+if playlist_id[:2] == "UC":
+    playlist_id = 'UU' + playlist_id[2:]
+playlist_url = f"https://www.youtube.com/playlist?list={playlist_id}"
+
+ydl_opts = {"dump_single_json": True, "extract_flat": True, "format": "best"}
+
+with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    playlist_data = ydl.extract_info(playlist_url, download=False)
+
+youtube = []
+for entry in playlist_data["entries"]:
+    youtube.append((entry["id"], entry["title"]))
+
+
+url = "https://feeds.captivate.fm/" + config.kolel["rss"]
 feed = feedparser.parse(url)
 len(feed["entries"])
 
@@ -19,10 +40,6 @@ podcast_titles = set()
 for entry in feed["entries"]:
     podcast_titles.add(entry["title"])
 
-youtube = []
-with open("all_videos.txt", "r") as f:
-    for line in f:
-        youtube.append((line[:11], line[12:-1]))
 
 
 def should_skip_title(title: str) -> bool:
