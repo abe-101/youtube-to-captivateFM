@@ -37,7 +37,8 @@ def download_youtube_video(url: str, folder_path: str) -> Dict[str, str]:
         url=url,
         thumbnail=video_info.get("thumbnail"),
     )
-    local_media.set_upload_date_from_string(video_info.get("upload_date"))
+    #local_media.set_upload_date_from_string(video_info.get("upload_date"))
+    local_media.set_upload_date_from_timestamp(video_info.get("release_timestamp"))
     return local_media
     # return {
     #    "title": video_info["title"],
