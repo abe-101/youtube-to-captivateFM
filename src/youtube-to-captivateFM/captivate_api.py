@@ -52,6 +52,7 @@ def upload_media(config: ConfigurationManager, show_id: str, file_name: str) -> 
     }
 
     try:
+        print(f"*~*Uploading {file_name} to captivate.fm")
         response = requests.post(
             f"https://api.captivate.fm/shows/{show_id}/media",
             headers=headers,
@@ -119,6 +120,7 @@ def create_podcast(
     headers = {"Authorization": "Bearer " + token}
 
     try:
+        print(f"*~* Creating {title} on captivate.fm")
         response = requests.request("POST", url, headers=headers, data=payload, files=files)
         response.raise_for_status()
         r = response.json()
@@ -190,12 +192,13 @@ def update_podcast(
     headers = {"Authorization": "Bearer " + token}
 
     try:
+        print(f"*~* Updating {title} on captivate.fm")
         response = requests.request("PUT", url, headers=headers, data=payload, files=files)
         response.raise_for_status()
         r = response.json()
         episode_id = r["episode"]["id"]
 
-        return episode_id
+        return f"https://player.captivate.fm/episode/{episode_id}"
     except requests.exceptions.HTTPError as error:
         print(f"An HTTP error occurred: {error}")
         return None
