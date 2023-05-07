@@ -34,7 +34,11 @@ def get_latest_spotify_episode_link(episode_name: str, podcast_channel_id: str, 
             print(f"Found Spotify link for {episode_name}\n{episode_link}")
             return episode_link
 
-        for i in range(5):
+        if len(response["items"]) < 5:
+            shows_to_print = len(response["items"])
+        else:
+            shows_to_print = 5
+        for i in range(shows_to_print):
             print(f'{i+1}. {response["items"][i]["name"]}')
         n = int(input("Choose episode 1-5 (0 to try again in 2): "))
         if n != 0:

@@ -13,7 +13,10 @@ EPISODE_TITLE = "מסכת סוטה דף ב - Rabbi Shloime Greenwald"
 
 def get_episode_links(episode_title, show, config: ConfigurationManager):
     captivate_link = get_captivate_link(show["rss"], episode_title)
-    apple_link = get_apple_link(show["apple_url"], episode_title)
+    if show["apple_url"] != "":
+        apple_link = get_apple_link(show["apple_url"], episode_title)
+    else:
+        apple_link = None
     spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
 
     return {"captivate": captivate_link, "apple": apple_link, "spotify": spotify_link}
