@@ -42,13 +42,13 @@ def kolel(url: str):
 def meseches_sota_shiur(youtube_url: str, num_daf: int):
     local_media: LocalMedia = download_youtube_video(youtube_url, config.sota["dir"])
 
-    print("getting thumbnail")
-    client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
-    pic = config.sota["dir"] + "square-lower/0" + str(num_daf) + ".jpg"
-    print(pic)
-    uploaded_image = client.upload_from_path(pic)
-    print(uploaded_image["link"])
-    local_media.thumbnail = uploaded_image["link"]
+    #print("getting thumbnail")
+    #client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
+    #pic = config.sota["dir"] + "square-lower/0" + str(num_daf) + ".jpg"
+    #print(pic)
+    #uploaded_image = client.upload_from_path(pic)
+    #print(uploaded_image["link"])
+    #local_media.thumbnail = uploaded_image["link"]
     episode = publish_podcast(local_media, config.sota, config, episode_num=str(num_daf))
     return episode
 
@@ -63,6 +63,7 @@ def chassidus_podcast(url: str):
 def add_youtube_to_chassidus_podcast(file_path_1, url, episode_id):
     file_2: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
     combined = combine_mp3_files(file_path_1, file_2.file_name)
+    #combined = combine_mp3_files(file_path_1, file_path_2)
     show_id = config.sg_chassidus["show_id"]
     media_id = upload_media(config=config, show_id=show_id, file_name=combined)
     print(media_id)
@@ -79,8 +80,19 @@ def add_youtube_to_chassidus_podcast(file_path_1, url, episode_id):
         episode_season=episode["episode_season"],
         episode_number=episode["episode_number"],
     )
-
     print(episode_url)
+
+def chassidus_create_podcast_and_video(file: str, title: str = None, desc: str = "", picture: str = "shloimy.jpg"):
+    if title is None:
+        title = file.split("/")[-1].split(".")[0]
+    local_media = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=picture)
+
+    audio_to_pls(local_media, config.sg_chassidus)
+    file = create_video_from_audio_and_picture(file, picture, "data/PLS" + title + ".mp4")
+    local_media.file_name = file
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+    print(youtube_url)
+
 
 
 def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", picture: str = "halacha.jpg"):
@@ -162,7 +174,7 @@ def add_youtube_to_pls(file_path_1, url, episode_id):
 
 
 def add_audio_to_pls(file_path_1, file_path_2, episode_id):
-    # file_path_2 = enhance_podcast(file_path_2, config)
+    file_path_2 = enhance_podcast(file_path_2, config)
     combined = combine_mp3_files(file_path_1, file_path_2)
     show_id = config.pls["show_id"]
     media_id = upload_media(config=config, show_id=show_id, file_name=combined)
@@ -189,6 +201,7 @@ def add_audio_to_pls(file_path_1, file_path_2, episode_id):
     )
 
     file = create_video_from_audio_and_picture(file_path_2, "shloimy.jpg", title_2 + ".mp4")
+    local_media.file_name = file
     upload_video_with_options(local_media, privacyStatus="public")
 
 
@@ -205,17 +218,17 @@ def pls_create_video_and_podcast(file: str, title: str, desc: str = "", picture:
 
 def youtube_to_pls(url: str):
     localMedia: LocalMedia = download_youtube_video(url, config.pls["dir"])
-    audio_to_pls(localMedia)
+    audio_to_pls(localMedia, config.pls)
 
 
 def audio_to_pls(localMedia: LocalMedia, show):
     show_id = show["show_id"]
-    media_id = upload_media(config=config, show_id=show_id, file_name=localMedia["file_name"])
+    media_id = upload_media(config=config, show_id=show_id, file_name=localMedia.file_name)
     episode_url = create_podcast(
         config=config,
         media_id=media_id,
-        date=formatted_upload_date,
-        title=localMedia["title"],
-        shownotes=localMedia["description"] + "\n" + localMedia["url"],
+        date=localMedia.upload_date,
+        title=localMedia.title,
+        shownotes=str(localMedia.description) + "\n" + localMedia.url,
         shows_id=show_id,
     )

@@ -100,6 +100,7 @@ class ConfigurationManager:
         self.SPOTIFY_PODCAST_PUBLISH = True if os.getenv("SPOTIFY_PODCAST_PUBLISH") == "True" else False
         self.YOUTUBE_API = os.getenv("YOUTUBE_API")
         self.KOLEL_YOUTUBE_CHANNEL_ID = os.getenv("KOLEL_YOUTUBE_CHANNEL_ID")
+        self.TINY_URL_API_KEY = os.getenv("TINY_URL_API_KEY")
 
     def get_captivate_token(self):
         if self.CAPTIVATE_TOKEN is None:
