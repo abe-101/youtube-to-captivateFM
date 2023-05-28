@@ -19,7 +19,7 @@ def get_episode_links(episode_title, show, config: ConfigurationManager):
         apple_link = None
     spotify_link = get_latest_spotify_episode_link(episode_title, show["spotify_id"], config)
 
-    return {"captivate": captivate_link, "apple": apple_link, "spotify": spotify_link}
+    return {"apple": apple_link, "spotify": spotify_link}
 
 
 def get_youtube_id(youtube_channel, episode_title):

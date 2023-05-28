@@ -38,9 +38,13 @@ def kolel(url: str):
     episode = publish_podcast(local_media, config.kolel, config)
     return episode
 
+def shuchat_podcast(url: str):
+    local_media: LocalMedia = download_youtube_video(url, config.shuchat["dir"])
+    episode = publish_podcast(local_media, config.shuchat, config)
+    return episode
 
-def meseches_sota_shiur(youtube_url: str, num_daf: int):
-    local_media: LocalMedia = download_youtube_video(youtube_url, config.sota["dir"])
+def meseches_gittin_shiur(youtube_url: str, num_daf: int):
+    local_media: LocalMedia = download_youtube_video(youtube_url, config.gittin["dir"])
 
     #print("getting thumbnail")
     #client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
@@ -49,7 +53,7 @@ def meseches_sota_shiur(youtube_url: str, num_daf: int):
     #uploaded_image = client.upload_from_path(pic)
     #print(uploaded_image["link"])
     #local_media.thumbnail = uploaded_image["link"]
-    episode = publish_podcast(local_media, config.sota, config, episode_num=str(num_daf))
+    episode = publish_podcast(local_media, config.gittin, config, episode_num=str(num_daf))
     return episode
 
 

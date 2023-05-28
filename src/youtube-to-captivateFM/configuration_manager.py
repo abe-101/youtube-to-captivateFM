@@ -28,7 +28,10 @@ class LocalMedia:
     
     def set_upload_date_from_timestamp(self, timestamp: int):
         try:
-            self.upload_date = datetime.fromtimestamp(timestamp)
+            if timestamp is None:
+                self.upload_date = datetime.now()
+            else:
+                self.upload_date = datetime.fromtimestamp(timestamp)
         except ValueError:
             print("Error: Invalid timestamp." + str(timestamp))
 
@@ -45,40 +48,47 @@ class ConfigurationManager:
         self.CAPTIVATE_API_KEY = os.getenv("CAPTIVATE_API_KEY")
 
         self.pls = {
-            "show_id": os.getenv("PLS_SHOW_ID"),
-            "spotify_id": os.getenv("PLS_SPOTIFY_ID"),
-            "dir": os.getenv("PLS_DIR"),
-            "apple_url": os.getenv("PLS_APPLE_URL"),
-            "rss": os.getenv("PLS_RSS"),
-        }
-        self.sota = {
-            "show_id": os.getenv("SOTA_SHOW_ID"),
-            "spotify_id": os.getenv("SOTA_SPOTIFY_ID"),
-            "dir": os.getenv("SOTA_DIR"),
-            "apple_url": os.getenv("SOTA_APPLE_URL"),
-            "rss": os.getenv("SOTA_RSS"),
-        }
+                "show_id": os.getenv("PLS_SHOW_ID"),
+                "spotify_id": os.getenv("PLS_SPOTIFY_ID"),
+                "dir": os.getenv("PLS_DIR"),
+                "apple_url": os.getenv("PLS_APPLE_URL"),
+                "rss": os.getenv("PLS_RSS"),
+                }
+        self.gittin = {
+                "show_id": os.getenv("GITTIN_SHOW_ID"),
+                "spotify_id": os.getenv("GITTIN_SPOTIFY_ID"),
+                "dir": os.getenv("GITTIN_DIR"),
+                "apple_url": os.getenv("GITTIN_APPLE_URL"),
+                "rss": os.getenv("GITTIN_RSS"),
+                }
         self.halacha = {
-            "show_id": os.getenv("HALACHA_SHOW_ID"),
-            "spotify_id": os.getenv("HALACHA_SPOTIFY_ID"),
-            "dir": os.getenv("HALACHA_DIR"),
-            "apple_url": os.getenv("HALACHA_APPLE_URL"),
-            "rss": os.getenv("HALACHA_RSS"),
-        }
+                "show_id": os.getenv("HALACHA_SHOW_ID"),
+                "spotify_id": os.getenv("HALACHA_SPOTIFY_ID"),
+                "dir": os.getenv("HALACHA_DIR"),
+                "apple_url": os.getenv("HALACHA_APPLE_URL"),
+                "rss": os.getenv("HALACHA_RSS"),
+                }
         self.kolel = {
-            "show_id": os.getenv("KOLEL_SHOW_ID"),
-            "spotify_id": os.getenv("KOLEL_SPOTIFY_ID"),
-            "dir": os.getenv("KOLEL_DIR"),
-            "apple_url": os.getenv("KOLEL_APPLE_URL"),
-            "rss": os.getenv("KOLEL_RSS"),
-        }
+                "show_id": os.getenv("KOLEL_SHOW_ID"),
+                "spotify_id": os.getenv("KOLEL_SPOTIFY_ID"),
+                "dir": os.getenv("KOLEL_DIR"),
+                "apple_url": os.getenv("KOLEL_APPLE_URL"),
+                "rss": os.getenv("KOLEL_RSS"),
+                }
         self.sg_chassidus = {
-            "show_id": os.getenv("SG_CHASSIDUS_SHOW_ID"),
-            "spotify_id": os.getenv("SG_CHASSIDUS_SPOTIFY_ID"),
-            "dir": os.getenv("SG_CHASSIDUS_DIR"),
-            "apple_url": os.getenv("SG_CHASSIDUS_APPLE_URL"),
-            "rss": os.getenv("SG_CHASSIDUS_RSS"),
-        }
+                "show_id": os.getenv("SG_CHASSIDUS_SHOW_ID"),
+                "spotify_id": os.getenv("SG_CHASSIDUS_SPOTIFY_ID"),
+                "dir": os.getenv("SG_CHASSIDUS_DIR"),
+                "apple_url": os.getenv("SG_CHASSIDUS_APPLE_URL"),
+                "rss": os.getenv("SG_CHASSIDUS_RSS"),
+                }
+        self.shuchat = {
+                "show_id": os.getenv("SHUCHAT_SHOW_ID"),
+                "spotify_id": os.getenv("SHUCHAT_SPOTIFY_ID"),
+                "dir": os.getenv("SHUCHAT_DIR"),
+                "apple_url": os.getenv("SHUCHAT_APPLE_URL"),
+                "rss": os.getenv("SHUCHAT_RSS"),
+                }
 
         self.IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
         self.IMGUR_CLIENT_SECRET = os.getenv("IMGUR_CLIENT_SECRET")
