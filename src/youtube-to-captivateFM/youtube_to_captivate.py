@@ -17,7 +17,6 @@ from audio_conversion import (
 from captivate_api import create_podcast, format_date, get_episode, publish_podcast, update_podcast, upload_media
 from configuration_manager import ConfigurationManager, LocalMedia
 from download_yt import download_youtube_video
-from podcast_links import get_episode_links, prepare_collive_embed, prepare_collive_post, prepare_sharable_post
 from spotify import get_latest_spotify_episode_link
 from upload_video import upload_video_with_options
 
@@ -46,13 +45,18 @@ def shuchat_podcast(url: str):
 def meseches_gittin_shiur(youtube_url: str, num_daf: int):
     local_media: LocalMedia = download_youtube_video(youtube_url, config.gittin["dir"])
 
-    #print("getting thumbnail")
-    #client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
-    #pic = config.sota["dir"] + "square-lower/0" + str(num_daf) + ".jpg"
-    #print(pic)
-    #uploaded_image = client.upload_from_path(pic)
-    #print(uploaded_image["link"])
-    #local_media.thumbnail = uploaded_image["link"]
+    try:
+        print("getting thumbnail")
+        client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
+        pic = config.gittin["dir"] + "/square/01" + str(num_daf-1) + ".jpg"
+        print(pic)
+        uploaded_image = client.upload_from_path(pic)
+        print(uploaded_image["link"])
+        local_media.thumbnail = uploaded_image["link"]
+    except Exception as e:
+        print("Error occurred during image uploading:", str(e))
+        # Handle the error or take appropriate action here
+
     episode = publish_podcast(local_media, config.gittin, config, episode_num=str(num_daf))
     return episode
 
@@ -116,7 +120,7 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
 
     file = enhance_podcast(file, config)
     local_media = LocalMedia(file_name=file, title=title, description=description, thumbnail=picture)
-    episode = publish_podcast(local_media, config.halacha, config)
+    #episode = publish_podcast(local_media, config.halacha, config)
 
     local_media.file_name = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
@@ -209,13 +213,16 @@ def add_audio_to_pls(file_path_1, file_path_2, episode_id):
     upload_video_with_options(local_media, privacyStatus="public")
 
 
-def pls_create_video_and_podcast(file: str, title: str, desc: str = "", picture: str = "shloimy.jpg"):
+def pls_create_video_and_podcast(file: str, title: str = None, desc: str = "", picture: str = "shloimy.jpg"):
+    if title is None:
+        title = file.split("/")[-1].split(".")[0]
     # enhanced_file = enhance_podcast(file, config)
 
     local_media = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=picture)
 
     audio_to_pls(local_media, config.pls)
-    file = create_video_from_audio_and_picture(file, picture, "data/PLS" + title + ".mp4")
+    file = create_video_from_audio_and_picture(file, picture, "data/PLS/" + title + ".mp4")
+    local_media.file_name = file
     youtube_url = upload_video_with_options(local_media, privacyStatus="public")
     print(youtube_url)
 

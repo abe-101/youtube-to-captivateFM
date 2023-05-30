@@ -18,7 +18,7 @@ class TinyURLAPI:
             "Authorization": f"Bearer {self.api_token}",
         }
 
-    def create_short_url(self, long_url, alias, domain="tinyurl.com", tags=[], expires_at=""):
+    def create_alias_url(self, long_url, alias, domain="tinyurl.com", tags=[], expires_at=""):
         payload = json.dumps(
             {"url": long_url, "domain": domain, "alias": alias, "tags": tags, "expires_at": expires_at}
         )
@@ -26,22 +26,45 @@ class TinyURLAPI:
         response = requests.request("POST", self.url + "create", headers=self.headers, data=payload)
         return response.json()["data"]["tiny_url"]
 
+    def get_alias_url(self, alias, domain="tinyurl.com"):
+        response = requests.request("GET", self.url + f"alias/{domain}/{alias}", headers=self.headers)
+        response_json = response.json()
+        if "data" in response_json and response_json["data"]:
+            return response_json["data"]["tiny_url"]
+        else:
+            return None
 
-# Example usage
-creator = TinyURLAPI(config.TINY_URL_API_KEY)
-apple_url = creator.create_short_url(
-    "https://podcasts.apple.com/us/podcast/kitzur-shulchan-aruch-%D7%A7%D7%A9%D7%95-%D7%A2-%D7%A1%D7%99%D7%9E%D7%9F-%D7%97-%D7%94%D7%9C%D7%9B%D7%95%D7%AA-%D7%93-%D7%95/id1684880937?i=1000614142250",
-    "Kitzur-5-23-Apple",
-)
+    def get_or_create_alias_url(self, long_url, alias, domain="tinyurl.com", tags=[], expires_at=""):
+        if long_url == None:
+            return None
+        existing_url = self.get_alias_url(alias, domain)
+        if existing_url:
+            return existing_url
+        else:
+            return self.create_alias_url(long_url, alias, domain, tags, expires_at)
 
-print(apple_url)
-youtube_url = creator.create_short_url(
-    "https://www.youtube.com/watch?v=QeovTCogC8M",
-    "Kitzur-5-23-YouTube",
-)
 
-spotiy_url = creator.create_short_url(
-    "https://open.spotify.com/episode/0V1p1cqEmyRje4oaJWxhze",
-    "Kitzur-5-23-Spotiy",
-)
-print(spotiy_url)
+
+if "__main__" == __name__:
+    # Example usage
+    creator = TinyURLAPI(config.TINY_URL_API_KEY)
+    youtube_url = creator.get_or_create_alias_url(
+        "https://chat.whatsapp.com/CuON9nbQvnWLapQlFXvlE3",
+        "Gittin-WhatsApp",
+    )
+    print(youtube_url)
+    #spotiy_url = creator.get_or_create_alias_url(
+    #    "https://open.spotify.com/show/0Cgr6r1gTNNzbln8ghofjH",
+    #    "Gittin-Spotify",
+    #)
+    #print(spotiy_url)
+    #apple_url = creator.get_or_create_alias_url(
+    #    "https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
+    #    "Gittin-Apple",
+    #)
+    #print(apple_url)
+    #print("\n\n")
+    #print(youtube_url[8:])
+    #print(spotiy_url[8:])
+    #print(apple_url[8:])
+

@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
 import os
-import subprocess
-import sys
 from collections import namedtuple
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
@@ -17,7 +15,8 @@ from rich.prompt import Prompt
 from rich.table import Table
 
 from configuration_manager import ConfigurationManager
-from podcast_links import get_episode_links, prepare_collive_embed, prepare_sharable_post
+from podcast_links import get_episode_links, Links, prepare_sharable_post
+from tiny_url import TinyURLAPI
 
 load_dotenv()
 
@@ -26,8 +25,23 @@ config = ConfigurationManager()
 YOUTUBE_TO_ANCHORFM = os.getenv("YOUTUBE_TO_ANCHORFM_DIR")
 api_key = config.YOUTUBE_API
 
+class Video:
+    def __init__(self, id, name, date):
+        self.id = id
+        self.name = name
+        self.date = date
+        self.links: Links = None
 
-def get_links(video):
+    def get_tiny_urls(self, create: TinyURLAPI, short_name: str):
+        self.links["youtube"] = create.get_or_create_alias_url(f"https://youtu.be/{self.id}", f"YouTube-{short_name}")
+        self.links["spotify"] = create.get_or_create_alias_url(self.links["spotify"], f"Spotify-{short_name}")
+        self.links["apple"] = create.get_or_create_alias_url(self.links["apple"], f"Apple-{short_name}")
+        return f"{self.links['youtube'][8:]}\n{self.links['spotify'][8:]}\n{self.links['apple'][8:]}"
+
+        
+
+
+def get_links(video: Video):
     show_names = [d for d in vars(config) if isinstance(vars(config)[d], dict)]
     print("Choose a Podcast show: ")
     for i, show in enumerate(show_names):
@@ -36,24 +50,41 @@ def get_links(video):
     show_num = int(input())
     shows = [vars(config)[d] for d in vars(config) if isinstance(vars(config)[d], dict)]
 
-    links = get_episode_links(video.name, shows[show_num], config)
-    # embed = prepare_collive_embed(links)
-    post = prepare_sharable_post(links, video.id, video.name)
+    video.links = get_episode_links(video.name, shows[show_num], config)
+    post = prepare_sharable_post(video.links, video.id, video.name)
+    if any(value is None for value in video.links.values()):
+        user_input = input("At least one value is None. Do you want to continue? (yes/no): ")
+        if user_input.lower() != "yes":
+            print(post)
+            exit()
 
-    # print(embed)
-    print(post)
-    print("Short on time? Listen to a recap: ")
+    creator = TinyURLAPI(config.TINY_URL_API_KEY)
+    match show_names[show_num]:
+        case "pls":
+            l = video.get_tiny_urls(creator, "pls1234")
+            print(video.name)
+            print(l)
 
+            pass
+        case "gittin":
+            digits = "".join([char for char in video.name if char.isdigit()])
+            l = video.get_tiny_urls(creator, f"Gittin-{digits}")
+            print(video.name + "\n")
+            print(l)
+            print("\n")
+            print("Short on time? Listen to a recap: ")
+        case "halacha":
+            today = datetime.today()
+            formatted_date = today.strftime("%m-%d")
 
-def publish_video(youtube_id: str):
-    print(f"Attempting {youtube_id}")
-    os.chdir(YOUTUBE_TO_ANCHORFM)
-    with open("episode.json", "w") as file:
-        file.write(f'{{"id":"{youtube_id}"}}')
+            l = video.get_tiny_urls(creator, "halacha-" + formatted_date)
+            print(video.name + "\n")
+            print(l)
+        case "kolel":
+            print(post)
+        case "sg_chassidus":
+            print(post)
 
-    subprocess.run(["npm start"], shell=True)
-
-    print(f"Finished {youtube_id}")
 
 
 # Specify the channel ID
@@ -73,7 +104,6 @@ request = youtube.search().list(
     type="video",
     order="date",
     maxResults=max_results,
-    # pageToken="CDIQAA"
 )
 
 try:
@@ -84,7 +114,7 @@ try:
 except HttpError as error:
     print(f"An HTTP error occurred: {error}")
 
-Video = namedtuple("Video", ["id", "name", "date"])
+#Video = namedtuple("Video", ["id", "name", "date"])
 db = list()
 for video in response["items"]:
     publish_time = video["snippet"]["publishedAt"]
@@ -114,10 +144,4 @@ choices = Prompt.ask(
 choices = choices.split(",")
 
 for choice in choices:
-    if choice == "0":
-        ids = input("Enter your video id's separated by a comma: ")
-        ids = ids.split(",")
-        for id in ids:
-            publish_video(id)
-    else:
-        get_links(db[int(choice) - 1])
+    get_links(db[int(choice) - 1])
