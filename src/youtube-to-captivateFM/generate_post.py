@@ -36,7 +36,7 @@ class Video:
         self.links["youtube"] = create.get_or_create_alias_url(f"https://youtu.be/{self.id}", f"YouTube-{short_name}")
         self.links["spotify"] = create.get_or_create_alias_url(self.links["spotify"], f"Spotify-{short_name}")
         self.links["apple"] = create.get_or_create_alias_url(self.links["apple"], f"Apple-{short_name}")
-        return f"{self.links['youtube'][8:]}\n{self.links['spotify'][8:]}\n{self.links['apple'][8:]}"
+        return f"{self.links['youtube']}\n{self.links['spotify']}\n{self.links['apple']}"
 
         
 
@@ -61,7 +61,9 @@ def get_links(video: Video):
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
     match show_names[show_num]:
         case "pls":
-            l = video.get_tiny_urls(creator, "pls1234")
+            today = datetime.today()
+            formatted_date = today.strftime("%m-%d")
+            l = video.get_tiny_urls(creator, "pls-" + formatted_date)
             print(video.name)
             print(l)
 
@@ -83,6 +85,11 @@ def get_links(video: Video):
         case "kolel":
             print(post)
         case "sg_chassidus":
+            today = datetime.today()
+            formatted_date = today.strftime("%m-%d")
+            l = video.get_tiny_urls(creator, "chassidus-" + formatted_date)
+            print(video.name)
+            print(l)
             print(post)
 
 

@@ -4,6 +4,22 @@ from typing import Optional
 from pydub import AudioSegment
 
 
+def normalize_volume(file_path: str, target_dBFS: float = -15.0) -> str:
+    sound = AudioSegment.from_mp3(file_path)
+    change_in_dBFS = target_dBFS - sound.dBFS
+    normalized_sound = sound.apply_gain(change_in_dBFS)
+
+    # Export the normalized sound and overwrite the original file
+    normalized_sound.export(file_path, format="mp3")
+
+    # Print the process
+    print(f"Normalized volume of '{file_path}' to {target_dBFS} dBFS.")
+    print(f"Overwrote the original file '{file_path}' with the normalized audio.")
+
+    return file_path
+
+
+
 def create_video_from_audio_and_picture(audio_file: str, image_file: str, video_file: str) -> str:
     """
     Creates a video from an audio file and an image file, and saves the video as a new file.
@@ -25,24 +41,16 @@ def create_video_from_audio_and_picture(audio_file: str, image_file: str, video_
         "ffmpeg",
         "-loop",
         "1",
+        "-y",  # Overwrite output file without asking
         "-i",
         image_file,
         "-i",
         audio_file,
-        "-c:v",
-        "libx264",
-        "-preset",
-        "medium",
-        "-tune",
-        "stillimage",
-        "-crf",
-        "18",
-        "-c:a",
-        "copy",
         "-shortest",
         video_file,
     ]
     subprocess.run(ffmpeg_command)
+
 
     return video_file
 

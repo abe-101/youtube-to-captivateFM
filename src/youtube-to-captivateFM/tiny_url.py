@@ -49,10 +49,15 @@ if "__main__" == __name__:
     # Example usage
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
     youtube_url = creator.get_or_create_alias_url(
-        "https://chat.whatsapp.com/CuON9nbQvnWLapQlFXvlE3",
-        "Gittin-WhatsApp",
+        "https://www.youtube.com/watch?v=57WTb6jNFqs",
+        "VeAtah-Tetzaveh",
     )
     print(youtube_url)
+    #youtube_url = creator.get_or_create_alias_url(
+    #    "https://www.youtube.com/watch?v=U3omQ6aAYRc",
+    #    "YouTube-Gittin-20",
+    #)
+    #print(youtube_url)
     #spotiy_url = creator.get_or_create_alias_url(
     #    "https://open.spotify.com/show/0Cgr6r1gTNNzbln8ghofjH",
     #    "Gittin-Spotify",
