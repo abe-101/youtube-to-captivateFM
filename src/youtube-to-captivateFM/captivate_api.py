@@ -4,6 +4,7 @@ from typing import Dict, Union
 import requests
 
 from configuration_manager import ConfigurationManager, LocalMedia
+from audio_conversion import normalize_volume
 
 
 def format_date(date: datetime) -> Union[str, None]:
@@ -39,6 +40,7 @@ def upload_media(config: ConfigurationManager, show_id: str, file_name: str) -> 
     :rtype: Union[str, None]
     :raise: Exception if the file upload fails.
     """
+    file_name = normalize_volume(file_name)
     token = config.get_captivate_token()
     headers = {
         "Authorization": "Bearer " + token,

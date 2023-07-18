@@ -24,7 +24,8 @@ def normalize_volume(file_path: str, target_dBFS: float = -15.0) -> str:
 def create_video_from_audio_and_picture(audio_path: str, image_path: str, output_path: str) -> str:
     """Create and save a video file to `output_path` after
     combining a static image that is located in `image_path`
-    with an audio file in `audio_path`"""
+    with an audio file in `audio_path`
+    https://www.thepythoncode.com/article/add-static-image-to-audio-in-python"""
     # create the audio clip object
     audio_clip = AudioFileClip(audio_path)
     # create the image clip object

@@ -37,18 +37,47 @@ def kolel(url: str):
     episode = publish_podcast(local_media, config.kolel, config)
     return episode
 
+
 def shuchat_podcast(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.shuchat["dir"])
     episode = publish_podcast(local_media, config.shuchat, config)
     return episode
 
-def meseches_gittin_shiur(youtube_url: str, num_daf: int):
+
+def gittin_audio_podcast(file: str, title: str = None, desc: str = "", picture: str = "gittin.jpg"):
+    if title is None:
+        title = file.split("/")[-1].split(".")[0]
+    file = enhance_podcast(file, config)
+    num_daf = "".join([char for char in title if char.isdigit()])
+    local_media = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=picture)
+    try:
+        print("getting thumbnail")
+        client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
+        pic = config.gittin["dir"] + "/podcast/square/" + num_daf + ".jpg"
+        print(pic)
+        uploaded_image = client.upload_from_path(pic)
+        print(uploaded_image["link"])
+        local_media.thumbnail = uploaded_image["link"]
+    except Exception as e:
+        print("Error occurred during image uploading:", str(e))
+        # Handle the error or take appropriate action here
+
+    episode = publish_podcast(local_media, config.gittin, config, episode_num=str(num_daf))
+
+    videoPic = config.gittin["dir"] + "/youtube/YouTube/" + num_daf + ".jpg"
+    local_media.file_name = create_video_from_audio_and_picture(file, videoPic, "data/gittin/" + title + ".mp4")
+    print("Uploading to YouTube")
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+
+
+def meseches_gittin_shiur(youtube_url: str):
     local_media: LocalMedia = download_youtube_video(youtube_url, config.gittin["dir"])
+    num_daf = "".join([char for char in local_media.title if char.isdigit()])
 
     try:
         print("getting thumbnail")
         client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
-        pic = config.gittin["dir"] + "/square/01" + str(num_daf-1) + ".jpg"
+        pic = config.gittin["dir"] + "/podcast/square/" + num_daf + ".jpg"
         print(pic)
         uploaded_image = client.upload_from_path(pic)
         print(uploaded_image["link"])
@@ -63,7 +92,7 @@ def meseches_gittin_shiur(youtube_url: str, num_daf: int):
 
 def chassidus_podcast(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.sg_chassidus["dir"])
-    # local_media.thumbnail = "data/sg-chassidus/sg-chassidus.jpg"
+    local_media.thumbnail = "data/sg-chassidus/sg-chassidus.jpg"
     episode = publish_podcast(local_media, config.sg_chassidus, config)
     print(episode)
 
@@ -90,17 +119,17 @@ def add_youtube_to_chassidus_podcast(file_path_1, url, episode_id):
     )
     print(episode_url)
 
+
 def chassidus_create_podcast_and_video(file: str, title: str = None, desc: str = "", picture: str = "shloimy.jpg"):
     if title is None:
         title = file.split("/")[-1].split(".")[0]
     local_media = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=picture)
 
     audio_to_pls(local_media, config.sg_chassidus)
-    file = create_video_from_audio_and_picture(file, picture, "data/PLS" + title + ".mp4")
+    file = create_video_from_audio_and_picture(file, picture, config.sg_chassidus["dir"] + title + ".mp4")
     local_media.file_name = file
     youtube_url = upload_video_with_options(local_media, privacyStatus="public")
     print(youtube_url)
-
 
 
 def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", picture: str = "halacha.jpg"):
@@ -120,7 +149,7 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
 
     file = enhance_podcast(file, config)
     local_media = LocalMedia(file_name=file, title=title, description=description, thumbnail=picture)
-    #episode = publish_podcast(local_media, config.halacha, config)
+    episode = publish_podcast(local_media, config.halacha, config)
 
     local_media.file_name = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
@@ -182,7 +211,7 @@ def add_youtube_to_pls(file_path_1, url, episode_id):
 
 
 def add_audio_to_pls(file_path_1, file_path_2, episode_id):
-    file_path_2 = enhance_podcast(file_path_2, config)
+    #file_path_2 = enhance_podcast(file_path_2, config)
     combined = combine_mp3_files(file_path_1, file_path_2)
     show_id = config.pls["show_id"]
     media_id = upload_media(config=config, show_id=show_id, file_name=combined)
@@ -205,7 +234,7 @@ def add_audio_to_pls(file_path_1, file_path_2, episode_id):
 
     title_2 = episode["title"] + " Part 2"
     local_media = LocalMedia(
-        file_name=file_path_2, title=title_2, description=episode["shownotes"], thumbnail="shloimy.jpg"
+        file_name=file_path_2, title=title_2, description="trial", thumbnail="shloimy.jpg"
     )
 
     file = create_video_from_audio_and_picture(file_path_2, "shloimy.jpg", title_2 + ".mp4")
@@ -216,7 +245,7 @@ def add_audio_to_pls(file_path_1, file_path_2, episode_id):
 def pls_create_video_and_podcast(file: str, title: str = None, desc: str = "", picture: str = "shloimy.jpg"):
     if title is None:
         title = file.split("/")[-1].split(".")[0]
-    # enhanced_file = enhance_podcast(file, config)
+    enhanced_file = enhance_podcast(file, config)
 
     local_media = LocalMedia(file_name=file, title=title, description=title + "\n" + desc, thumbnail=picture)
 
