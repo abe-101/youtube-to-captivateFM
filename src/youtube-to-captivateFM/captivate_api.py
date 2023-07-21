@@ -2,6 +2,7 @@ from datetime import datetime, time
 from typing import Dict, Union
 
 import requests
+import logging
 
 from configuration_manager import ConfigurationManager, LocalMedia
 from audio_conversion import normalize_volume
@@ -26,7 +27,9 @@ def format_date(date: datetime) -> Union[str, None]:
         return None
 
 
-def upload_media(config: ConfigurationManager, show_id: str, file_name: str) -> Union[str, None]:
+def upload_media(
+    config: ConfigurationManager, show_id: str, file_name: str, logger: logging.Logger = logging.getLogger(__name__)
+) -> Union[str, None]:
     """
     This function uploads a file to captivate.fm using an API, and returns the media_id.
 
@@ -207,7 +210,11 @@ def update_podcast(
 
 
 def publish_podcast(
-    local_media: LocalMedia, show: Dict[str, str], config: ConfigurationManager, episode_num: str = "1"
+    local_media: LocalMedia,
+    show: Dict[str, str],
+    config: ConfigurationManager,
+    episode_num: str = "1",
+    logger: logging.Logger = logging.getLogger(__name__),
 ) -> str:
     """
     Publishes an audio file as a new podcast episode on CaptivateFM.
@@ -227,12 +234,18 @@ def publish_podcast(
     formatted_upload_date = format_date(local_media.upload_date)
     show_id = show["show_id"]
     media_id = upload_media(config=config, show_id=show_id, file_name=local_media.file_name)
+
+    video_id = local_media.url[-11:]
+    short_youtube_url = "youtu.be/" + video_id
+    youtube = "\nWatch on YouTube: <a href='" + local_media.url + "'>" + short_youtube_url + "</a>\n"
+    brought_by = "\nBrought to you by: <b><a href='https://www.shiurim.net/'>Shiurim.net</a></b>\nContact us for all your podcast needs: <a href='mailto:podcast@shiurim.net'>podcast@shiurim.net</a>\n"
+    shownotes = local_media.description + youtube + brought_by
     episode_id = create_podcast(
         config=config,
         media_id=media_id,
         date=formatted_upload_date,
         title=local_media.title,
-        shownotes=local_media.description + "\n" + local_media.url,
+        shownotes=shownotes,
         shows_id=show_id,
         episode_number=episode_num,
         episode_art=local_media.thumbnail,

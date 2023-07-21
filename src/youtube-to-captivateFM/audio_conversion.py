@@ -1,4 +1,5 @@
 import subprocess
+import os
 from moviepy.editor import AudioFileClip, ImageClip
 
 from typing import Optional
@@ -26,6 +27,11 @@ def create_video_from_audio_and_picture(audio_path: str, image_path: str, output
     combining a static image that is located in `image_path`
     with an audio file in `audio_path`
     https://www.thepythoncode.com/article/add-static-image-to-audio-in-python"""
+    if os.path.exists(output_path):
+        print(f"file: {output_path}\n---\n   \ was already created, skipping")
+        return output_path
+
+
     # create the audio clip object
     audio_clip = AudioFileClip(audio_path)
     # create the image clip object

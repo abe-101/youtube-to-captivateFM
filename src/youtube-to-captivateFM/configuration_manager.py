@@ -53,6 +53,7 @@ class ConfigurationManager:
                 "dir": os.getenv("PLS_DIR"),
                 "apple_url": os.getenv("PLS_APPLE_URL"),
                 "rss": os.getenv("PLS_RSS"),
+                "playlist_id": os.getenv("PLS_PLAYLIST_ID"),
                 }
         self.gittin = {
                 "show_id": os.getenv("GITTIN_SHOW_ID"),
@@ -60,6 +61,7 @@ class ConfigurationManager:
                 "dir": os.getenv("GITTIN_DIR"),
                 "apple_url": os.getenv("GITTIN_APPLE_URL"),
                 "rss": os.getenv("GITTIN_RSS"),
+                "playlist_id": os.getenv("GITTIN_PLAYLIST_ID"),
                 }
         self.halacha = {
                 "show_id": os.getenv("HALACHA_SHOW_ID"),
@@ -67,6 +69,7 @@ class ConfigurationManager:
                 "dir": os.getenv("HALACHA_DIR"),
                 "apple_url": os.getenv("HALACHA_APPLE_URL"),
                 "rss": os.getenv("HALACHA_RSS"),
+                "playlist_id": os.getenv("HALACHA_PLAYLIST_ID"),
                 }
         self.kolel = {
                 "show_id": os.getenv("KOLEL_SHOW_ID"),
@@ -74,6 +77,7 @@ class ConfigurationManager:
                 "dir": os.getenv("KOLEL_DIR"),
                 "apple_url": os.getenv("KOLEL_APPLE_URL"),
                 "rss": os.getenv("KOLEL_RSS"),
+                "playlist_id": os.getenv("KOLEL_PLAYLIST_ID"),
                 }
         self.sg_chassidus = {
                 "show_id": os.getenv("SG_CHASSIDUS_SHOW_ID"),
@@ -81,6 +85,7 @@ class ConfigurationManager:
                 "dir": os.getenv("SG_CHASSIDUS_DIR"),
                 "apple_url": os.getenv("SG_CHASSIDUS_APPLE_URL"),
                 "rss": os.getenv("SG_CHASSIDUS_RSS"),
+                "playlist_id": os.getenv("SG_CHASSIDUS_PLAYLIST_ID"),
                 }
         self.shuchat = {
                 "show_id": os.getenv("SHUCHAT_SHOW_ID"),
@@ -88,7 +93,41 @@ class ConfigurationManager:
                 "dir": os.getenv("SHUCHAT_DIR"),
                 "apple_url": os.getenv("SHUCHAT_APPLE_URL"),
                 "rss": os.getenv("SHUCHAT_RSS"),
+                "playlist_id": os.getenv("SHUCHAT_PLAYLIST_ID"),
                 }
+        self.rm_torah = {
+                "show_id": os.getenv("RM_TORAH_SHOW_ID"),
+                "spotify_id": os.getenv("RM_TORAH_SPOTIFY_ID"),
+                "dir": os.getenv("RM_TORAH_DIR"),
+                "apple_url": os.getenv("RM_TORAH_APPLE_URL"),
+                "rss": os.getenv("RM_TORAH_RSS"),
+                "playlist_id": os.getenv("RM_TORAH_PLAYLIST_ID"),
+                }
+        self.rm_maamor = {
+                "show_id": os.getenv("RM_MAAMOR_SHOW_ID"),
+                "spotify_id": os.getenv("RM_MAAMOR_SPOTIFY_ID"),
+                "dir": os.getenv("RM_MAAMOR_DIR"),
+                "apple_url": os.getenv("RM_MAAMOR_APPLE_URL"),
+                "rss": os.getenv("RM_MAAMOR_RSS"),
+                "playlist_id": os.getenv("RM_MAAMOR_PLAYLIST_ID"),
+                }
+        self.rm_tanya = {
+                "show_id": os.getenv("RM_TANYA_SHOW_ID"),
+                "spotify_id": os.getenv("RM_TANYA_SPOTIFY_ID"),
+                "dir": os.getenv("RM_TANYA_DIR"),
+                "apple_url": os.getenv("RM_TANYA_APPLE_URL"),
+                "rss": os.getenv("RM_TANYA_RSS"),
+                "playlist_id": os.getenv("RM_TANYA_PLAYLIST_ID"),
+                }
+        self.rm_happy = {
+                "show_id": os.getenv("RM_HAPPY_SHOW_ID"),
+                "spotify_id": os.getenv("RM_HAPPY_SPOTIFY_ID"),
+                "dir": os.getenv("RM_HAPPY_DIR"),
+                "apple_url": os.getenv("RM_HAPPY_APPLE_URL"),
+                "rss": os.getenv("RM_HAPPY_RSS"),
+                "playlist_id": os.getenv("RM_HAPPY_PLAYLIST_ID"),
+                }
+
 
         self.IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
         self.IMGUR_CLIENT_SECRET = os.getenv("IMGUR_CLIENT_SECRET")

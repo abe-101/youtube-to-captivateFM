@@ -1,4 +1,5 @@
 import os
+import logging
 
 from playwright.sync_api import Playwright, sync_playwright
 
@@ -7,7 +8,12 @@ from configuration_manager import ConfigurationManager
 
 
 # Function to run the audio enhancement process using Adobe Podcast
-def run(playwright: Playwright, file_name: str, config: ConfigurationManager) -> None:
+def run(
+    playwright: Playwright,
+    file_name: str,
+    config: ConfigurationManager,
+    logger: logging.Logger = logging.getLogger(__name__),
+) -> None:
     new_file = file_name.rsplit(".", 1)[0] + " (enhanced).mp3"
     # check if file was already enhanced
     if os.path.exists(new_file):
@@ -53,9 +59,11 @@ def run(playwright: Playwright, file_name: str, config: ConfigurationManager) ->
     return new_name
 
 
-def enhance_podcast(file_name: str, config: ConfigurationManager) -> str:
+def enhance_podcast(
+    file_name: str, config: ConfigurationManager, logger: logging.Logger = logging.getLogger(__name__)
+) -> str:
     with sync_playwright() as playwright:
-        new_file = run(playwright, file_name, config)
+        new_file = run(playwright, file_name, config, logger)
     return new_file
 
 

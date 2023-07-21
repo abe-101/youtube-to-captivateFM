@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import googleapiclient.errors
 from rich.console import Console
 
 # from rich import print
@@ -32,25 +33,17 @@ class Video:
         self.date = date
         self.links: Links = None
 
-    def get_tiny_urls(self, create: TinyURLAPI, short_name: str):
-        self.links["youtube"] = create.get_or_create_alias_url(f"https://youtu.be/{self.id}", f"YouTube-{short_name}")
-        self.links["spotify"] = create.get_or_create_alias_url(self.links["spotify"], f"Spotify-{short_name}")
-        self.links["apple"] = create.get_or_create_alias_url(self.links["apple"], f"Apple-{short_name}")
+    def get_tiny_urls(self, create: TinyURLAPI, short_name: str, tags: str = [""]):
+        self.links["youtube"] = create.get_or_create_alias_url(f"https://youtu.be/{self.id}", f"{short_name}-YouTube", tags=tags.append("youtube"))
+        self.links["spotify"] = create.get_or_create_alias_url(self.links["spotify"], f"{short_name}-Spotify", tags=tags.append("spotify"))
+        self.links["apple"] = create.get_or_create_alias_url(self.links["apple"], f"{short_name}-Apple", tags=tags.append("apple"))
         return f"{self.links['youtube']}\n{self.links['spotify']}\n{self.links['apple']}"
 
         
 
 
-def get_links(video: Video):
-    show_names = [d for d in vars(config) if isinstance(vars(config)[d], dict)]
-    print("Choose a Podcast show: ")
-    for i, show in enumerate(show_names):
-        print(f"{i}: {show}")
-
-    show_num = int(input())
-    shows = [vars(config)[d] for d in vars(config) if isinstance(vars(config)[d], dict)]
-
-    video.links = get_episode_links(video.name, shows[show_num], config)
+def get_links(video: Video, show, show_name):
+    video.links = get_episode_links(video.name, show, config)
     post = prepare_sharable_post(video.links, video.id, video.name)
     if any(value is None for value in video.links.values()):
         user_input = input("At least one value is None. Do you want to continue? (yes/no): ")
@@ -59,18 +52,19 @@ def get_links(video: Video):
             exit()
 
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
-    match show_names[show_num]:
+    match show_name:
         case "pls":
             today = datetime.today()
             formatted_date = today.strftime("%m-%d")
-            l = video.get_tiny_urls(creator, "pls-" + formatted_date)
+            l = video.get_tiny_urls(creator, "pls-" + formatted_date, tags=["pls"])
             print(video.name)
+            print("\n")
             print(l)
 
             pass
         case "gittin":
             digits = "".join([char for char in video.name if char.isdigit()])
-            l = video.get_tiny_urls(creator, f"Gittin-{digits}")
+            l = video.get_tiny_urls(creator, short_name=f"Gittin-{digits}", tags=["gittin"])
             print(video.name + "\n")
             print(l)
             print("\n")
@@ -91,64 +85,116 @@ def get_links(video: Video):
             print(video.name)
             print(l)
             print(post)
+        case "rm_torah":
+            parsha = input("Enter the parsha: ")
+            l = video.get_tiny_urls(creator, short_name=parsha, tags=["parsha"])
+            print(video.name)
+            print("\n")
+            print(l)
+        case "rm_maamor":
+            today = datetime.today()
+            formatted_date = today.strftime("%m-%d")
+            l = video.get_tiny_urls(creator, short_name=f"maamorim-{formatted_date}", tags=["maamorim"])
+            print(video.name)
+            print("\n")
+            print(l)
 
+def get_all_videos_from_playlist(youtube, playlist_id):
+    # Fetch all videos from the playlist
+    videos = []
+    nextPageToken = None
+    try:
+        while True:
+            playlist_response = youtube.playlistItems().list(
+                part="snippet",
+                playlistId=playlist_id,
+                maxResults=50,
+                pageToken=nextPageToken,
+            ).execute()
 
+            # Extract video details from the response
+            for video in playlist_response["items"]:
+                publish_time = video["snippet"]["publishedAt"]
+                # convert date to datetime object
+                publish_time_dt = datetime.strptime(publish_time, "%Y-%m-%dT%H:%M:%SZ")
+                # convert from utc to est
+                est_time = publish_time_dt.replace(tzinfo=timezone.utc).astimezone(ZoneInfo("America/New_York"))
+                videos.append(Video(id=video["snippet"]["resourceId"]["videoId"], name=video["snippet"]["title"], date=est_time))
 
-# Specify the channel ID
-channel_id = "UCU91spVc-WB73HnPZiEqMNQ"
+            nextPageToken = playlist_response.get("nextPageToken")
+            if not nextPageToken:
+                break
+    except googleapiclient.errors.HttpError as e:
+        print(f"An error occurred: {e}")
 
-# Set the number of results to be retrieved (max. 50)
-max_results = 15
+    # Sort videos based on their published date in descending order
+    #videos.sort(key=lambda x: x.date, reverse=True)
 
-# Create a YouTube API service object
-youtube = build("youtube", "v3", developerKey=api_key)
+    return videos
 
-# Call the YouTube Data API's "search" method to retrieve the most recent
-# videos from the specified channel
-request = youtube.search().list(
-    part="id,snippet",
-    channelId=channel_id,
-    type="video",
-    order="date",
-    maxResults=max_results,
-)
+def get_most_recent_videos_from_playlist(youtube, playlist_id, max_results):
+    videos = []
+    try:
+        playlist_response = youtube.playlistItems().list(
+            part="snippet",
+            playlistId=playlist_id,
+            maxResults=max_results,
+        ).execute()
 
-try:
-    # Execute the request
-    response = request.execute()
+        # Extract video details from the playlist_response
+        for video in playlist_response["items"]:
+            publish_time = video["snippet"]["publishedAt"]
+            # convert date to datetime object
+            publish_time_dt = datetime.strptime(publish_time, "%Y-%m-%dT%H:%M:%SZ")
+            # convert from utc to est
+            est_time = publish_time_dt.replace(tzinfo=timezone.utc).astimezone(ZoneInfo("America/New_York"))
+            videos.append(Video(id=video["snippet"]["resourceId"]["videoId"], name=video["snippet"]["title"], date=est_time))
+    except googleapiclient.errors.HttpError as e:
+        print(f"An error occurred: {e}")
+    return videos
 
+if __name__ == "__main__":
 
-except HttpError as error:
-    print(f"An HTTP error occurred: {error}")
-
-#Video = namedtuple("Video", ["id", "name", "date"])
-db = list()
-for video in response["items"]:
-    publish_time = video["snippet"]["publishedAt"]
-    # convert date to datetime object
-    publish_time_dt = datetime.strptime(publish_time, "%Y-%m-%dT%H:%M:%SZ")
-    # convert from utc to est
-    est_time = publish_time_dt.replace(tzinfo=timezone.utc).astimezone(ZoneInfo("America/New_York"))
-    db.append(Video(id=video["id"]["videoId"], name=video["snippet"]["title"], date=est_time))
-table = Table(title="Please choose from the following videos:")
-table.add_column("#", style="cyan", no_wrap=True)
-table.add_column("video ID", style="magenta")
-table.add_column("Date and Time", style="green")
-table.add_column("Name", style="cyan", no_wrap=True)
-
-for i, v in enumerate(db):
-    table.add_row(str(i + 1), v.id, str(v.date), v.name)
-    # print(i + 1, " | ", v.id, " | ", v.date, " | ", v.name)
-
-console = Console()
-console.print(table)
-
-
-choices = Prompt.ask(
-    "Enter your choices separated by a comma: ", default="0", choices=[str(i) for i in range(len(db) + 1)]
-)
-
-choices = choices.split(",")
-
-for choice in choices:
-    get_links(db[int(choice) - 1])
+    show_names = [d for d in vars(config) if isinstance(vars(config)[d], dict)]
+    print("Choose a Podcast show: ")
+    for i, show in enumerate(show_names):
+        print(f"{i}: {show}")
+    
+    show_num = int(input())
+    shows = [vars(config)[d] for d in vars(config) if isinstance(vars(config)[d], dict)]
+    
+    
+    # Specify the channel ID
+    #channel_id = "UCU91spVc-WB73HnPZiEqMNQ"
+    playlist_id = shows[show_num]["playlist_id"]
+    
+    # Set the number of results to be retrieved (max. 50)
+    max_results = 15
+    
+    youtube = build("youtube", "v3", developerKey=api_key)
+    # Create a YouTube API service object
+    
+    db = get_most_recent_videos_from_playlist(youtube, playlist_id, max_results)
+    
+    table = Table(title="Please choose from the following videos:")
+    table.add_column("#", style="cyan", no_wrap=True)
+    table.add_column("video ID", style="magenta")
+    table.add_column("Date and Time", style="green")
+    table.add_column("Name", style="cyan", no_wrap=True)
+    
+    for i, v in enumerate(db):
+        table.add_row(str(i + 1), v.id, str(v.date), v.name)
+        # print(i + 1, " | ", v.id, " | ", v.date, " | ", v.name)
+    
+    console = Console()
+    console.print(table)
+    
+    
+    choices = Prompt.ask(
+        "Enter your choices separated by a comma: ", default="0", choices=[str(i) for i in range(len(db) + 1)]
+    )
+    
+    choices = choices.split(",")
+    
+    for choice in choices:
+        get_links(db[int(choice) - 1], shows[show_num], show_names[show_num])
