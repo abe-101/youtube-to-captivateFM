@@ -1,17 +1,21 @@
-import requests
 import json
-from dotenv import load_dotenv
-from configuration_manager import ConfigurationManager
 from urllib.parse import urlparse
+
+import requests
+from configuration_manager import ConfigurationManager
+from dotenv import load_dotenv
 
 load_dotenv()
 
 config = ConfigurationManager()
 
+
 def capitalize_url(url):
     parsed_url = urlparse(url)
-    domain_parts = parsed_url.netloc.split('.')
-    capitalized_domain = '.'.join([part.capitalize() if i < len(domain_parts) - 1 else part for i, part in enumerate(domain_parts)])
+    domain_parts = parsed_url.netloc.split(".")
+    capitalized_domain = ".".join(
+        [part.capitalize() if i < len(domain_parts) - 1 else part for i, part in enumerate(domain_parts)]
+    )
     capitalized_url = f"{parsed_url.scheme}://{capitalized_domain}{parsed_url.path}"
     return capitalized_url
 
@@ -26,8 +30,8 @@ class TinyURLAPI:
             "Authorization": f"Bearer {self.api_token}",
         }
 
-    def create_alias_url(self, long_url, alias, domain="my.shiurim.net", tags='', expires_at=""):
-        if tags == '':
+    def create_alias_url(self, long_url, alias, domain="my.shiurim.net", tags="", expires_at=""):
+        if tags == "":
             tags = []
         payload = json.dumps(
             {"url": long_url, "domain": domain, "alias": alias, "tags": tags, "expires_at": expires_at}
@@ -44,8 +48,8 @@ class TinyURLAPI:
         else:
             return None
 
-    def get_or_create_alias_url(self, long_url, alias, domain="my.shiurim.net", tags='', expires_at=""):
-        if tags == '':
+    def get_or_create_alias_url(self, long_url, alias, domain="my.shiurim.net", tags="", expires_at=""):
+        if tags == "":
             tags = []
         if long_url == None:
             return None
@@ -56,33 +60,32 @@ class TinyURLAPI:
             return self.create_alias_url(long_url, alias, domain, tags, expires_at)
 
 
-
 if "__main__" == __name__:
     # Example usage
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
     url = creator.get_or_create_alias_url(
-        "https://podcasts.apple.com/us/podcast/chassidic-discourses-mamarim-by-rabbi-yitzchok-minkowicz/id1698437841",
-        "Chassidic-Discourses-Apple",
+        "https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
+        "Gittin-Apple",
     )
     print(url)
 
     url = creator.get_or_create_alias_url(
-        "https://open.spotify.com/show/5Y2P2STTBFSHHel1EfkGet",
-        "Chassidic-Discourses-Spotify",
+        "https://open.spotify.com/show/0Cgr6r1gTNNzbln8ghofjH",
+        "Gittin-Spotify",
     )
     print(url)
     url = creator.get_or_create_alias_url(
-        "https://podcasts.google.com/feed/aHR0cHM6Ly9mZWVkcy5jYXB0aXZhdGUuZm0vY2hhc3NpZGljLWRpc2NvdXJzZXMv",
-        "Chassidic-Discourses-Google",
+        "https://podcasts.google.com/feed/aHR0cHM6Ly9mZWVkcy5jYXB0aXZhdGUuZm0vZ2l0dGlu",
+        "Gittin-Google",
     )
     print(url)
     url = creator.get_or_create_alias_url(
-        "https://www.youtube.com/playlist?list=PLSpyM_kqmTMo9VWeJlg7bp7iP9FXg1m1v",
-        "Chassidic-Discourses-YouTube",
+        "https://www.youtube.com/playlist?list=PLFy3gCT2Rdy-umH9TAvs7VnF8peLPXZRo",
+        "Gittin-YouTube",
     )
     print(url)
     url = creator.get_or_create_alias_url(
-        "https://chassidic-discourses.captivate.fm/listen",
-        "Chassidic-Discourses",
+        "https://gittin.captivate.fm/listen",
+        "Gittin",
     )
     print(url)

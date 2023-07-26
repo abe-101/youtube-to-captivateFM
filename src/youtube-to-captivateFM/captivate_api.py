@@ -1,14 +1,13 @@
+import logging
 from datetime import datetime, time
 from typing import Dict, Union
 
 import requests
-import logging
-
-from configuration_manager import ConfigurationManager, LocalMedia
 from audio_conversion import normalize_volume
+from configuration_manager import ConfigurationManager, LocalMedia
 
 
-def format_date(date: datetime) -> Union[str, None]:
+def format_date(date: datetime) -> str | None:
     """
     This function takes in a date string in the format "YYYYMMDD" and returns it in the format "YYYY-MM-DD 12:00:00"
 
@@ -29,7 +28,7 @@ def format_date(date: datetime) -> Union[str, None]:
 
 def upload_media(
     config: ConfigurationManager, show_id: str, file_name: str, logger: logging.Logger = logging.getLogger(__name__)
-) -> Union[str, None]:
+) -> str | None:
     """
     This function uploads a file to captivate.fm using an API, and returns the media_id.
 
@@ -82,7 +81,7 @@ def create_podcast(
     status: str = "draft",
     episode_season: str = "1",
     episode_number: str = "1",
-) -> Union[str, None]:
+) -> str | None:
     """
     This function creates a podcast on captivate.fm using the API, by taking in all the parameters and putting them in the payload, and returns the response.
 
@@ -137,7 +136,7 @@ def create_podcast(
         return None
 
 
-def get_episode(config: ConfigurationManager, episode_id: str) -> Union[dict, None]:
+def get_episode(config: ConfigurationManager, episode_id: str) -> dict | None:
     """
     This function gets the full information for a episode
 
@@ -178,7 +177,7 @@ def update_podcast(
     status: str = "draft",
     episode_season: str = "1",
     episode_number: str = "1",
-) -> Union[str, None]:
+) -> str | None:
     token = config.get_captivate_token()
     url = f"https://api.captivate.fm/episodes/{episode_id}"
 
@@ -211,7 +210,7 @@ def update_podcast(
 
 def publish_podcast(
     local_media: LocalMedia,
-    show: Dict[str, str],
+    show: dict[str, str],
     config: ConfigurationManager,
     episode_num: str = "1",
     logger: logging.Logger = logging.getLogger(__name__),

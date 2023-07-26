@@ -1,16 +1,15 @@
 import csv
 
 import feedparser
+import yt_dlp
 from configuration_manager import ConfigurationManager
 from dotenv import load_dotenv
-
-import yt_dlp
 
 load_dotenv()
 config = ConfigurationManager()
 playlist_id = config.KOLEL_YOUTUBE_CHANNEL_ID
 if playlist_id[:2] == "UC":
-    playlist_id = 'UU' + playlist_id[2:]
+    playlist_id = "UU" + playlist_id[2:]
 playlist_url = f"https://www.youtube.com/playlist?list={playlist_id}"
 
 ydl_opts = {"dump_single_json": True, "extract_flat": True, "format": "best"}
@@ -39,7 +38,6 @@ len(podcast_ids)
 podcast_titles = set()
 for entry in feed["entries"]:
     podcast_titles.add(entry["title"])
-
 
 
 def should_skip_title(title: str) -> bool:

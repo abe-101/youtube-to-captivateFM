@@ -1,10 +1,9 @@
-import os
 import logging
-
-from playwright.sync_api import Playwright, sync_playwright
+import os
 
 from audio_conversion import convert_wav_to_mp3
 from configuration_manager import ConfigurationManager
+from playwright.sync_api import Playwright, sync_playwright
 
 
 # Function to run the audio enhancement process using Adobe Podcast
@@ -17,7 +16,7 @@ def run(
     new_file = file_name.rsplit(".", 1)[0] + " (enhanced).mp3"
     # check if file was already enhanced
     if os.path.exists(new_file):
-        print(f"file: {file_name}\n---\n   \ was already enhanced, skipping")
+        print(f"file: {file_name}\n---\n   \\ was already enhanced, skipping")
         return new_file
 
     print(f"Enhancing file {file_name}")
@@ -55,7 +54,7 @@ def run(
     context.close()
     browser.close()
 
-    print(f"========\nSuccess!\n========\n\n{new_file}\n___\n   \ has been enhanced!\n___/")
+    print(f"========\nSuccess!\n========\n\n{new_file}\n___\n   \\ has been enhanced!\n___/")
     return new_name
 
 

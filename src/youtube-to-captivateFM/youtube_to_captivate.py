@@ -1,25 +1,22 @@
 #!/usr/bin/python
 
 import asyncio
+import logging
 import time
 from datetime import datetime
 
-from dotenv import load_dotenv
-from imgurpython import ImgurClient
-
 from adobe_podcast import enhance_podcast
-from audio_conversion import (
-    combine_mp3_files,
-    combine_webm_files,
-    convert_wav_to_mp3,
-    create_video_from_audio_and_picture,
-)
-from captivate_api import create_podcast, format_date, get_episode, publish_podcast, update_podcast, upload_media
+from audio_conversion import (combine_mp3_files, combine_webm_files,
+                              convert_wav_to_mp3,
+                              create_video_from_audio_and_picture)
+from captivate_api import (create_podcast, format_date, get_episode,
+                           publish_podcast, update_podcast, upload_media)
 from configuration_manager import ConfigurationManager, LocalMedia
+from dotenv import load_dotenv
 from download_yt import download_youtube_video
+from imgurpython import ImgurClient
 from spotify import get_latest_spotify_episode_link
 from upload_video import upload_video_with_options
-import logging
 
 # Set up logging configuration
 logging.basicConfig(
@@ -72,7 +69,7 @@ def gittin_audio_podcast(file: str, title: str = None, desc: str = "", picture: 
         print("Error occurred during image uploading:", str(e))
         # Handle the error or take appropriate action here
 
-    #episode = publish_podcast(local_media, config.gittin, config, episode_num=str(num_daf), logger=logger)
+    episode = publish_podcast(local_media, config.gittin, config, episode_num=str(num_daf), logger=logger)
 
     videoPic = config.gittin["dir"] + "/youtube/YouTube/" + num_daf + ".jpg"
     local_media.file_name = create_video_from_audio_and_picture(file, videoPic, "data/gittin/" + title + ".mp4")

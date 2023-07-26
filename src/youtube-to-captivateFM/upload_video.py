@@ -5,14 +5,13 @@ import random
 from collections import namedtuple
 
 import httplib2
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
+from configuration_manager import ConfigurationManager, LocalMedia
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
-
-from configuration_manager import ConfigurationManager, LocalMedia
 
 Options = namedtuple("Options", ["file", "title", "description", "category", "keywords", "privacyStatus"])
 
@@ -65,8 +64,8 @@ VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")
 
 
 def get_service():
-    #flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
-    #credentials = flow.run_local_server()
+    # flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
+    # credentials = flow.run_local_server()
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -81,7 +80,7 @@ def get_service():
             # If you don't have the credentials.json file, create it by following YouTube API documentation.
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
-        
+
         # Save the credentials for the next run
         with open("token.json", "w") as token:
             token.write(creds.to_json())

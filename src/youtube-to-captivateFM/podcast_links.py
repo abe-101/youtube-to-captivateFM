@@ -1,7 +1,6 @@
 import feedparser
 import requests
 from bs4 import BeautifulSoup
-
 from configuration_manager import ConfigurationManager
 from spotify import get_latest_spotify_episode_link
 
@@ -71,7 +70,6 @@ def get_anchor_link(rss_url, episode_title):
         if episode["title"] == episode_title:
             return episode["links"][0]["href"]
     return None
-
 
 
 def prepare_sharable_post(links: dict, youtube_id: str, video_title: str):

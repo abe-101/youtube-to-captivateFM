@@ -2,23 +2,19 @@
 # monkey.patch_all()
 
 import logging
-import unicodedata
+import os
 import re
-
+import unicodedata
+from http.client import IncompleteRead
 from typing import Dict
 
-from yt_dlp import YoutubeDL
-from yt_dlp.utils import DownloadError
-from http.client import IncompleteRead
+import googleapiclient.errors
+from configuration_manager import LocalMedia
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-import googleapiclient.errors
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import DownloadError
 
-
-from configuration_manager import LocalMedia
-
-
-import os
 
 def clean_video_title(title):
     cleaned_title = unicodedata.normalize("NFKC", title)
@@ -27,7 +23,7 @@ def clean_video_title(title):
 
 def download_youtube_video(
     url: str, folder_path: str, logger: logging.Logger = logging.getLogger(__name__)
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """
     This function downloads a YouTube video from the given URL, and returns a dictionary containing the video's title, description, file name and upload date.
 
@@ -94,4 +90,3 @@ def download_youtube_video(
     # if local_media.upload_date is None or local_media.upload_date == "":
     local_media.set_upload_date_from_string(video_info.get("upload_date"))
     return local_media
-
