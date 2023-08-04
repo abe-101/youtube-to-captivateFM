@@ -101,7 +101,7 @@ def get_links(video: Video, show, show_name):
             print(l)
         case "rm_maamor":
             maamor = input("Enter the maamor: ")
-            l = video.get_tiny_urls(creator, short_name=f"maamorim-{maamor}", tags=["maamorim"])
+            l = video.get_tiny_urls(creator, short_name=f"{maamor}", tags=["maamorim"])
             print(video.name)
             print("\n")
             print(l)
