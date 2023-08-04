@@ -157,7 +157,7 @@ class ConfigurationManager:
             self.CAPTIVATE_TOKEN = self._get_captivate_token()
         return self.CAPTIVATE_TOKEN
 
-    def _get_captivate_token(self) -> str | None:
+    def _get_captivate_token(self) -> str:
         """
         This function gets a token from the captivate.fm API, using the user_id and api_key as authentication.
 
