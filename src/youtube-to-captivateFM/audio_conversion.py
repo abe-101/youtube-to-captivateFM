@@ -45,7 +45,7 @@ def create_video_from_audio_and_picture(audio_path: str, image_path: str, output
     return output_path
 
 
-def convert_wav_to_mp3(input_file: str, output_file: str | None = None) -> str:
+def convert_wav_to_mp3(input_file: str, output_file: str = None) -> str:
     """Convert WAV audio file to MP3.
 
     :param input_file: The file path of the WAV audio file to be converted.
