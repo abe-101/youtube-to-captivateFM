@@ -7,7 +7,7 @@ from audio_conversion import normalize_volume
 from configuration_manager import ConfigurationManager, LocalMedia
 
 
-def format_date(date: datetime) -> str | None:
+def format_date(date: datetime) -> str:
     """
     This function takes in a date string in the format "YYYYMMDD" and returns it in the format "YYYY-MM-DD 12:00:00"
 
