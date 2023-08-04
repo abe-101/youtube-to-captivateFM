@@ -54,7 +54,7 @@ CLIENT_SECRETS_FILE = "client_secret.json"
 # This OAuth 2.0 access scope allows an application to upload files to the
 # authenticated user's YouTube Channel, but it doesn't allow other types
 # of access
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = ["https://www.googleapis.com/auth/youtube"]
 API_SERVICE_NAME = "youtube"
 API_VERSION = "v3"
 
@@ -99,9 +99,9 @@ def resumable_upload(request):
             status, response = request.next_chunk()
             if response is not None:
                 if "id" in response:
-                    print('Video ID "%s" was successfully uploaded.' % response["id"])
-                    video_url = "https://www.youtube.com/watch?v=%s" % response["id"]
-                    print(video_url)
+                    # print('Video ID "%s" was successfully uploaded.' % response["id"])
+                    video_id = response["id"]
+                    # print(video_url)
                 else:
                     exit("The upload failed with an unexpected response: %s" % response)
         except HttpError as e:
@@ -119,7 +119,7 @@ def resumable_upload(request):
             max_sleep = 2**retry
             sleep_seconds = random.random() * max_sleep
             print("sleeping %f seconds and then retrying..." % sleep_seconds)
-    return video_url
+    return video_id
 
 
 # this function creates the request and initializes the upload
@@ -145,7 +145,11 @@ def initialize_upload(youtube, options):
 
 
 def upload_video_with_options(
-    localMedia: LocalMedia, category: str = "22", keywords: str = "", privacyStatus: str = "private"
+    localMedia: LocalMedia,
+    category: str = "22",
+    keywords: str = "",
+    privacyStatus: str = "private",
+    playlist_id: str = "",
 ):
     options = Options(
         file=localMedia.file_name,
@@ -159,8 +163,29 @@ def upload_video_with_options(
     os.environ["OUATHLIB_INSECURE_TRANSPORT"] = "1"
     # Call the upload_video method with the options
     youtubedata = get_service()
-    video_url = initialize_upload(youtubedata, options)
-    return video_url
+    video_id = initialize_upload(youtubedata, options)
+    video_url = "https://www.youtube.com/watch?v=%s" % video_id
+    print(video_url)
+    add_video_to_playlist(youtubedata, video_id, playlist_id)
+
+    return video_id
+
+
+def add_video_to_playlist(youtube, videoID, playlist_id):
+    add_video_request = (
+        youtube.playlistItems()
+        .insert(
+            part="snippet",
+            body={
+                "snippet": {
+                    "playlistId": playlist_id,
+                    "resourceId": {"kind": "youtube#video", "videoId": videoID}
+                    #'position': 0
+                }
+            },
+        )
+        .execute()
+    )
 
 
 # function when run directly

@@ -74,7 +74,7 @@ def gittin_audio_podcast(file: str, title: str = None, desc: str = "", picture: 
     videoPic = config.gittin["dir"] + "/youtube/YouTube/" + num_daf + ".jpg"
     local_media.file_name = create_video_from_audio_and_picture(file, videoPic, "data/gittin/" + title + ".mp4")
     print("Uploading to YouTube")
-    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public", playlist_id=config.gittin["playlist_id"])
 
 
 def meseches_gittin_shiur(youtube_url: str):
@@ -135,7 +135,7 @@ def chassidus_create_podcast_and_video(file: str, title: str = None, desc: str =
     audio_to_pls(local_media, config.sg_chassidus)
     file = create_video_from_audio_and_picture(file, picture, config.sg_chassidus["dir"] + title + ".mp4")
     local_media.file_name = file
-    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public", playlist_id=config.sg_chassidus["playlist_id"])
     print(youtube_url)
 
 
@@ -160,7 +160,7 @@ def the_daily_halacha_shiur(file: str, title: str = None, desc: str = "", pictur
 
     local_media.file_name = create_video_from_audio_and_picture(file, picture, "data/halacha/" + title + ".mp4")
     print("Uploading to YouTube")
-    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public", playlist_id=config.halacha["playlist_id"])
 
     print(description)
 
@@ -244,7 +244,7 @@ def add_audio_to_pls(file_path_1, file_path_2, episode_id):
 
     file = create_video_from_audio_and_picture(file_path_2, "shloimy.jpg", title_2 + ".mp4")
     local_media.file_name = file
-    upload_video_with_options(local_media, privacyStatus="public")
+    upload_video_with_options(local_media, privacyStatus="public", playlist_id=config.pls["playlist_id"])
 
 
 def pls_create_video_and_podcast(file: str, title: str = None, desc: str = "", picture: str = "shloimy.jpg"):
@@ -257,7 +257,7 @@ def pls_create_video_and_podcast(file: str, title: str = None, desc: str = "", p
     audio_to_pls(local_media, config.pls)
     file = create_video_from_audio_and_picture(file, picture, "data/PLS/" + title + ".mp4")
     local_media.file_name = file
-    youtube_url = upload_video_with_options(local_media, privacyStatus="public")
+    youtube_url = upload_video_with_options(local_media, privacyStatus="public", playlist_id=config.pls["playlist_id"])
     print(youtube_url)
 
 
