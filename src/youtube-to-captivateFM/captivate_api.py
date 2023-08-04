@@ -28,7 +28,7 @@ def format_date(date: datetime) -> str | None:
 
 def upload_media(
     config: ConfigurationManager, show_id: str, file_name: str, logger: logging.Logger = logging.getLogger(__name__)
-) -> str | None:
+) -> str:
     """
     This function uploads a file to captivate.fm using an API, and returns the media_id.
 
@@ -81,7 +81,7 @@ def create_podcast(
     status: str = "draft",
     episode_season: str = "1",
     episode_number: str = "1",
-) -> str | None:
+) -> str:
     """
     This function creates a podcast on captivate.fm using the API, by taking in all the parameters and putting them in the payload, and returns the response.
 
@@ -136,7 +136,7 @@ def create_podcast(
         return None
 
 
-def get_episode(config: ConfigurationManager, episode_id: str) -> dict | None:
+def get_episode(config: ConfigurationManager, episode_id: str) -> dict:
     """
     This function gets the full information for a episode
 
@@ -177,7 +177,7 @@ def update_podcast(
     status: str = "draft",
     episode_season: str = "1",
     episode_number: str = "1",
-) -> str | None:
+) -> str:
     token = config.get_captivate_token()
     url = f"https://api.captivate.fm/episodes/{episode_id}"
 
