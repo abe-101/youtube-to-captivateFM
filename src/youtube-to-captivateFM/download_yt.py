@@ -59,6 +59,7 @@ def download_youtube_video(
             return None
 
         file_name = f"{folder_path}/{video_info['title']}.mp3"  # Get the file name based on the video title
+        file_name = re.sub(r'[\\/]', '_', file_name)
 
         if os.path.exists(file_name):
             print("Video already exists. Skipping download.")
@@ -67,6 +68,7 @@ def download_youtube_video(
             while retry_count < max_retries:
                 try:
                     ydl.download([url])  # Download the video
+                    os.rename(f'{folder_path}/{video_info["id"]}.mp3', file_name)  # Rename the file to match the video title
                     break  # Break the loop if download succeeds
                 except DownloadError as e:
                     retry_count += 1
@@ -75,7 +77,6 @@ def download_youtube_video(
                 print(f"Failed to download the video after {max_retries} attempts.")
                 return None
 
-    os.rename(f'{folder_path}/{video_info["id"]}.mp3', file_name)  # Rename the file to match the video title
     if len(url) == 11:
         url = f"https://www.youtube.com/watch?v={url}"
 

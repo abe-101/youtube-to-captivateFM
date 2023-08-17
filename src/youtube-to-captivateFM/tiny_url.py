@@ -64,28 +64,28 @@ if "__main__" == __name__:
     # Example usage
     creator = TinyURLAPI(config.TINY_URL_API_KEY)
     url = creator.get_or_create_alias_url(
-        "https://podcasts.apple.com/us/podcast/meseches-gittin-rabbi-shloime-greenwald/id1689640425",
-        "Gittin-Apple",
+        "https://podcasts.apple.com/us/podcast/meseches-kidushin-rabbi-shloimy-greenwald/id1702973020",
+        "Kidushin-Apple",
     )
     print(url)
 
     url = creator.get_or_create_alias_url(
-        "https://open.spotify.com/show/0Cgr6r1gTNNzbln8ghofjH",
-        "Gittin-Spotify",
+        "https://open.spotify.com/show/47DILD7zgofUlxttgXG1RQ",
+        "Kidushin-Spotify",
     )
     print(url)
+#    url = creator.get_or_create_alias_url(
+#        "https://podcasts.google.com/feed/aHR0cHM6Ly9mZWVkcy5jYXB0aXZhdGUuZm0vZ2l0dGlu",
+#        "Kidushin-Google",
+#    )
+#    print(url)
     url = creator.get_or_create_alias_url(
-        "https://podcasts.google.com/feed/aHR0cHM6Ly9mZWVkcy5jYXB0aXZhdGUuZm0vZ2l0dGlu",
-        "Gittin-Google",
-    )
-    print(url)
-    url = creator.get_or_create_alias_url(
-        "https://www.youtube.com/playlist?list=PLFy3gCT2Rdy-umH9TAvs7VnF8peLPXZRo",
-        "Gittin-YouTube",
+        "https://www.youtube.com/playlist?list=PLFy3gCT2Rdy-B3O9QSkvJCzM1pHLSIbCs'",
+        "Kidushin-YouTube",
     )
     print(url)
     url = creator.get_or_create_alias_url(
         "https://gittin.captivate.fm/listen",
-        "Gittin",
+        "Kidushin",
     )
     print(url)

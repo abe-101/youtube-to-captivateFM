@@ -63,6 +63,14 @@ class ConfigurationManager:
             "rss": os.getenv("GITTIN_RSS"),
             "playlist_id": os.getenv("GITTIN_PLAYLIST_ID"),
         }
+        self.kidushin = {
+            "show_id": os.getenv("KIDUSHIN_SHOW_ID"),
+            "spotify_id": os.getenv("KIDUSHIN_SPOTIFY_ID"),
+            "dir": os.getenv("KIDUSHIN_DIR"),
+            "apple_url": os.getenv("KIDUSHIN_APPLE_URL"),
+            "rss": os.getenv("KIDUSHIN_RSS"),
+            "playlist_id": os.getenv("KIDUSHIN_PLAYLIST_ID"),
+        }
         self.halacha = {
             "show_id": os.getenv("HALACHA_SHOW_ID"),
             "spotify_id": os.getenv("HALACHA_SPOTIFY_ID"),

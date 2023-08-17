@@ -77,6 +77,13 @@ def get_links(video: Video, show, show_name):
             print(l)
             print("\n")
             print("Short on time? Listen to a recap: ")
+        case "kidushin":
+            digits = "".join([char for char in video.name if char.isdigit()])
+            l = video.get_tiny_urls(creator, short_name=f"Kidushin-{digits}", tags=["kidushin"])
+            print(video.name + "\n")
+            print(l)
+            print("\n")
+            print("Short on time? Listen to a recap: ")
         case "halacha":
             today = datetime.today()
             formatted_date = today.strftime("%m-%d")

@@ -1,12 +1,13 @@
 import csv
 import re
+import os
 
 import feedparser
 import googleapiclient.errors
 import yt_dlp
 from configuration_manager import ConfigurationManager
 from dotenv import load_dotenv
-from generate_post import Video, get_most_recent_videos_from_playlist
+from generate_post import Video, get_most_recent_videos_from_playlist, get_all_videos_from_playlist
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -23,7 +24,20 @@ def get_new_videos(show):
     youtube = build("youtube", "v3", developerKey=api_key)
     # Create a YouTube API service object
 
-    db = get_most_recent_videos_from_playlist(youtube, playlist_id, max_results)
+    #db = get_most_recent_videos_from_playlist(youtube, playlist_id, max_results)
+    if not os.path.exists(f"db/{playlist_id}.csv"):
+        db = get_all_videos_from_playlist(youtube, playlist_id)
+        with open(f"db/{playlist_id}.csv", "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(["id", "name", "date"])
+            for video in db:
+                writer.writerow([video.id, video.name, video.date])
+    else:
+        db = []
+        with open(f"db/{playlist_id}.csv", "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                db.append(Video(row[0], row[1], row[2]))
 
     # playlist_url = f"https://www.youtube.com/playlist?list={show['playlist_id']}"
     # ydl_opts = {"dump_single_json": True, "extract_flat": True, "format": "best"}
@@ -51,6 +65,9 @@ def get_new_videos(show):
         if video.id not in podcast_ids and video.name not in podcast_titles:
             youtube.append((video.id, video.name))
 
+    print(f"Youtube: {len(youtube)}")
+    # ensure there are no duplicates
+    youtube = list(set(youtube))
     print(f"Youtube: {len(youtube)}")
     return youtube
 

@@ -4,7 +4,7 @@ import asyncio
 import logging
 import re
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from adobe_podcast import enhance_podcast
 from audio_conversion import (combine_mp3_files, combine_webm_files,
@@ -73,6 +73,7 @@ def torah_playlist():
 
 def maamor_podcast(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.rm_maamor["dir"], logger=logger)
+    local_media.upload_date = datetime.now()
     episode = publish_podcast(local_media, config.rm_maamor, config)
     print(episode)
 
@@ -111,6 +112,8 @@ def tanya_podcast(url: str):
 
 def torah_podcast(url: str):
     local_media: LocalMedia = download_youtube_video(url, config.rm_torah["dir"], logger=logger)
+    # set the upload date to one be one week from now
+    local_media.upload_date = datetime.now()
     episode = publish_podcast(local_media, config.rm_torah, config, logger=logger)
     print(episode)
 

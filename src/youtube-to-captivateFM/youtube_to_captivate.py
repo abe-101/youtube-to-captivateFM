@@ -32,6 +32,25 @@ load_dotenv()
 config = ConfigurationManager()
 
 
+def meseches_kidushin_shiur(youtube_url: str):
+    local_media: LocalMedia = download_youtube_video(youtube_url, config.kidushin["dir"], logger=logger)
+    num_daf = "".join([char for char in local_media.title if char.isdigit()])
+
+    try:
+        print("getting thumbnail")
+        client = ImgurClient(config.IMGUR_CLIENT_ID, config.IMGUR_CLIENT_SECRET)
+        pic = config.kidushin["dir"] + "/podcast/00" + num_daf + ".jpg"
+        print(pic)
+        uploaded_image = client.upload_from_path(pic)
+        print(uploaded_image["link"])
+        local_media.thumbnail = uploaded_image["link"]
+    except Exception as e:
+        print("Error occurred during image uploading:", str(e))
+        # Handle the error or take appropriate action here
+
+    episode = publish_podcast(local_media, config.kidushin, config, episode_num=str(num_daf), logger=logger)
+    return episode
+
 def all_kolel():
     with open("needs_podcasts.csv") as f:
         for line in f:
